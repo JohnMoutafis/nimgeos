@@ -1,2 +1,2 @@
 # nimgeos
-A Nim wrapper for libgeos
+Nim wrapper for the GEOS geometry engine (libgeos_c)

@@ -1,3 +1,18 @@
+# Nim build artifacts
 nimcache/
+*.exe
+*.out
+*.o
+*.a
+
+# Nimble
 nimblecache/
+.nimble/
+nimble.lock  # add only once deps are stable
+
 htmldocs/
+
+# OS
+.DS_Store
+Thumbs.db
+
