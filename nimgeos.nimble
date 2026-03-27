@@ -7,7 +7,3 @@ srcDir        = "src"
 
 # Dependencies
 requires "nim >= 2.0.0"
-
-# Tasks
-task test, "Run all tests":
-  exec "nimble -d:testing test"
