@@ -6,7 +6,6 @@ import ./errors
 
 # ── Message handler callbacks ─────────────────────────────────────────────────
 # These are plain C callbacks — no Nim GC objects may be captured.
-
 proc defaultNoticeHandler(message: cstring; userdata: pointer) {.cdecl, raises: [], gcsafe.} =
   ## Default notice handler that writes to stderr.
   when defined(geosDebug):
@@ -23,7 +22,6 @@ proc defaultErrorHandler(message: cstring; userdata: pointer) {.cdecl, raises: [
     discard
 
 # ── GeosContext type ───────────────────────────────────────────────────────────
-
 type
   GeosContext* = object
     handle*: GEOSContextHandle_t
@@ -38,7 +36,6 @@ proc `=destroy`*(ctx: GeosContext) =
     GEOS_finish_r(ctx.handle)
 
 # ── Constructor ───────────────────────────────────────────────────────────────
-
 proc initGeosContext*(
   noticeHandler: GEOSMessageHandler_r = defaultNoticeHandler,
   errorHandler:  GEOSMessageHandler_r = defaultErrorHandler
@@ -50,13 +47,12 @@ proc initGeosContext*(
 
   GEOSContext_setNoticeMessageHandler_r(handle, noticeHandler, nil)
   GEOSContext_setErrorMessageHandler_r(handle, errorHandler, nil)
-  result = GeosContext(handle: handle)
+  return GeosContext(handle: handle)
 
 # ── Utility ───────────────────────────────────────────────────────────────────
-
 proc version*(ctx: GeosContext): string =
   ## Returns the runtime GEOS version string e.g. "3.12.1"
-  $GEOSversion()
+  return $GEOSversion()
 
 proc isNil*(ctx: GeosContext): bool {.inline.} =
   ## Checks if the context handle is nil (i.e. the context has been destroyed).
