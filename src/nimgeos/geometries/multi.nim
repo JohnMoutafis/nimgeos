@@ -1,6 +1,7 @@
 ## Multi-geometry types and operations.
-## All four multi-types share the same sub-geometry accessor pattern
+## All constructors take ownership of input geometry handles.
 
+import std/sequtils
 import ../geos_abi
 import ../context
 import ../errors
@@ -20,21 +21,72 @@ type
   GeometryCollectionObj*   = object of GeometryObj
   GeometryCollection*      = ref GeometryCollectionObj
 
-# ── Shared sub-geometry accessor ──────────────────────────────────────────────
-proc geomN*(g: Geometry; n: int): Geometry =
-  ## Returns the nth sub-geometry as a cloned base Geometry.
-  ## Works on any multi-geometry or collection.
-  g.checkHandle("geomN")
-  let count = g.numGeometries()
-  if n < 0 or n >= count:
-    raise newException(GeosGeomError, "geomN index out of bounds: " & $n)
+# --- Internal helpers ----------------------------------------------------------
 
-  let borrowed = GEOSGetGeometryN_r(g.ctx.handle, g.handle, n.cint)
-  if cast[pointer](borrowed) == nil:
-    raise newException(GeosGeomError, "GEOSGetGeometryN_r failed at index " & $n)
-  return wrapHandle(g.ctx, GEOSGeom_clone_r(g.ctx.handle, borrowed))
+proc inferCollectionGeomType(ctx: ptr GeosContext; handles: seq[GEOSGeometry]): GeomType =
+  ## Infer the appropriate multi-geometry type from the GEOS handles.
+  ##   all-Point      → MultiPoint
+  ##   all-LineString → MultiLineString
+  ##   all-Polygon    → MultiPolygon
+  ##   mixed          → GeometryCollection.
+  if handles.len == 0:
+    raise newException(GeosGeomError, "Cannot infer geometry type from empty sequence")
+
+  let firstId = GeomType(GEOSGeomTypeId_r(ctx.handle, handles[0]))
+  if handles.allIt(GeomType(GEOSGeomTypeId_r(ctx.handle, it)) == firstId):
+    case firstId
+    of gtPoint:      return gtMultiPoint
+    of gtLineString: return gtMultiLineString
+    of gtPolygon:    return gtMultiPolygon
+    else:            return gtGeometryCollection
+  else:
+    return gtGeometryCollection
+
+proc wrapMultiHandle(ctx: ptr GeosContext; handle: GEOSGeometry; geomType: GeomType): Geometry =
+  ## Wrap a raw collection handle in the correct concrete multi-geometry type.
+  ## Avoids a circular import of factories.
+  case geomType
+  of gtMultiPoint:         MultiPoint(ctx: ctx, handle: handle)
+  of gtMultiLineString:    MultiLineString(ctx: ctx, handle: handle)
+  of gtMultiPolygon:       MultiPolygon(ctx: ctx, handle: handle)
+  of gtGeometryCollection: GeometryCollection(ctx: ctx, handle: handle)
+  else:
+    raise newException(GeosGeomError, "wrapMultiHandle: unexpected kind " & $geomType)
+
+# --- Constructor ---------------------------------------------------------------
+
+proc createMultiGeometry*(ctx: var GeosContext; geoms: var seq[Geometry]): Geometry =
+  ## Unified multi-geometry constructor.
+  ## Infers the collection type from the input geometries:
+  ##   all Point      → MultiPoint
+  ##   all LineString → MultiLineString
+  ##   all Polygon    → MultiPolygon
+  ##   mixed          → GeometryCollection
+  ## Takes ownership of all geometry handles.
+  ## Do NOT use geoms after this call.
+  if geoms.len == 0:
+    raise newException(GeosGeomError, "Cannot create multi-geometry from empty sequence")
+
+  for i, g in geoms:
+    g.checkHandle("createMultiGeometry geoms[" & $i & "]")
+
+  var handles = newSeq[GEOSGeometry](geoms.len)
+  for i, g in geoms: handles[i] = g.handle
+
+  let geomType = inferCollectionGeomType(addr ctx, handles)
+
+  let mHandle = GEOSGeom_createCollection_r(
+    ctx.handle, geomType.cint, addr handles[0], handles.len.cuint)
+  if cast[pointer](mHandle) == nil:
+    raise newException(GeosGeomError, "GEOSGeom_createCollection_r failed (kind=" & $geomType & ")")
+
+  # Neutralise — GEOS owns the handles now
+  for g in geoms: g.handle = cast[GEOSGeometry](nil)
+
+  return wrapMultiHandle(addr ctx, mHandle, geomType)
 
 # ── String representations ────────────────────────────────────────────────────
+
 method `$`*(g: MultiPoint): string =
   if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiPoint>"
   return "MultiPoint(" & $g.numGeometries() & " points)"
