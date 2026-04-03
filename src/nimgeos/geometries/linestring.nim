@@ -1,6 +1,6 @@
 ## LineString geometry type and operations.
 
-import ../geos_abi
+import ../private/geos_abi
 import ../context
 import ../errors
 import ../geometry

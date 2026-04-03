@@ -1,7 +1,7 @@
 ## Base Geometry type. All concrete types inherit from this.
 ## Owns the GEOSGeometry handle — destroyed when ref count hits zero.
 
-import ./geos_abi
+import ./private/geos_abi
 import ./context
 import ./errors
 

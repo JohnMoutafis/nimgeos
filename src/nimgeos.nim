@@ -10,6 +10,8 @@ import nimgeos/geometries/multi
 import nimgeos/geometries/factories
 ## Serializers
 import nimgeos/serializers/wkt
+## Predicates
+import nimgeos/spatial_predicates
 
 export errors
 export context
@@ -23,3 +25,5 @@ export multi
 export factories
 ## Serializers
 export wkt
+## Predicates
+export spatial_predicates

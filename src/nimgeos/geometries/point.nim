@@ -1,7 +1,7 @@
 ## Point geometry type and operations.
 
 import std/math
-import ../geos_abi
+import ../private/geos_abi
 import ../context
 import ../errors
 import ../geometry

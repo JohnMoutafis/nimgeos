@@ -1,7 +1,7 @@
 ## GEOS context lifecycle wrapper.
 ## One GeosContext per thread. Non-copyable, deterministically destroyed by ORC.
 
-import ./geos_abi
+import ./private/geos_abi
 import ./errors
 
 # ── Message handler callbacks ─────────────────────────────────────────────────

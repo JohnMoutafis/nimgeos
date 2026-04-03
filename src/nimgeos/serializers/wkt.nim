@@ -1,6 +1,6 @@
 ## A WKT (Well-Known Text) serializer for Nimgeos.
 
-import ../geos_abi
+import ../private/geos_abi
 import ../context
 import ../geometry
 import ../geometries/factories

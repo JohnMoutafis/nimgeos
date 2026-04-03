@@ -1,6 +1,6 @@
 ## Factory procs: wrap raw GEOSGeometry handles in the correct concrete type.
 
-import ../geos_abi
+import ../private/geos_abi
 import ../context
 import ../errors
 import ../geometry

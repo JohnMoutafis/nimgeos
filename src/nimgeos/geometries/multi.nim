@@ -2,7 +2,7 @@
 ## All constructors take ownership of input geometry handles.
 
 import std/sequtils
-import ../geos_abi
+import ../private/geos_abi
 import ../context
 import ../errors
 import ../geometry

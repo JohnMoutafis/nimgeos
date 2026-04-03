@@ -1,5 +1,5 @@
 import unittest
-import nimgeos/geos_abi
+import nimgeos/private/geos_abi
 
 suite "Geos ABI smoke test":
   test "GEOSversion returns a non-empty string":

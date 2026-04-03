@@ -1,0 +1,94 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [0.3.0] - 2026-04-03
+
+### Added
+
+- **Spatial predicates** — new module `src/nimgeos/spatial_predicates.nim` exposing 8 idiomatic
+  Nim wrapper procs over the GEOS spatial predicate functions:
+  - `equals`, `intersects`, `contains`, `within`, `touches`, `disjoint`, `crosses`, `overlaps`
+  - All procs operate on the base `Geometry` type and validate both arguments via `checkHandle`
+    before delegating to the underlying GEOS `_r` function.
+  - A GEOS exception result raises `GeosGeomError` consistently with the rest of the library.
+- **`testPredicates` nimble task** — convenience shortcut for running predicate tests only.
+- **Predicate test suite** — `tests/t_spatial_predicates.nim` with 62 tests across 9 suites:
+  one suite per predicate and a cross-predicate relationships suite invariants.
+
+### Changed
+
+- `geos_abi.nim` moved from `src/nimgeos/` to `src/nimgeos/private/` to make explicit that the
+  raw FFI bindings are an internal implementation detail and are not part of the public API.
+
+---
+
+## [0.2.0] - 2026-04-01
+
+### Added
+
+- **Multi-geometry types** — `MultiPoint`, `MultiLineString`, `MultiPolygon`, and
+  `GeometryCollection` are now first-class types in `src/nimgeos/geometries/multi.nim`.
+- **Unified constructor** — a single `createMultiGeometry` proc handles all four multi-types;
+  the correct concrete type is returned based on the input geometry kinds.
+- **`geomN` accessor** — retrieves the n-th sub-geometry from any multi-type as its concrete
+  subtype (e.g. `MultiPoint.geomN(i)` returns a `Point`). Implemented in
+  `geometries/factories.nim` to avoid circular imports.
+    - TODO: Maybe a better implementation is in order for `geomN`.
+- **Multi-geometry test suite** — `tests/test_geometries/t_multi.nim` with comprehensive
+  coverage of construction, sub-geometry access, bounds-checking, geometry properties, and
+  string representation for all multi-types.
+
+---
+
+## [0.1.0] - 2026-03-31
+
+### Added
+
+- **Concrete geometry types** — `Point`, `LineString`, `LinearRing`, and `Polygon` subtypes of
+  the base `Geometry`, each with type-specific property accessors:
+  - `Point` — `x()`, `y()`, `z()` (returns `NaN` for 2D geometries)
+  - `LineString` — `numPoints()`, `pointN()`, `startPoint()`, `endPoint()`
+  - `LinearRing` — closed-ring validation, `numCoordinates()`
+  - `Polygon` — `exteriorRing()`, `numInteriorRings()`, `interiorRingN()`
+- **Coordinate-based constructors** — `createPoint`, `createLineString`, `createLinearRing`,
+  `createPolygon` on `GeosContext`, all accepting plain Nim tuples.
+- **WKT serializer** — `src/nimgeos/serializers/wkt.nim`:
+  - `fromWKT(ctx, wkt)` — parses any WKT string into the correct concrete `Geometry` subtype;
+    raises `GeosParseError` on invalid input.
+  - `toWKT(g)` — serialises any geometry back to a canonical WKT string.
+- **Geometry factory** — `src/nimgeos/geometries/factories.nim` dispatches raw
+  `GEOSGeometry` handles to the correct concrete Nim type.
+- **`testGeometries` and `testSerializers` nimble tasks** — convenience shortcuts for
+  running geometry and serializer tests independently.
+- **Test suites** — `tests/test_geometries/` and `tests/test_serializers/` with full coverage
+  of construction, coordinate accessors, geometry properties (`area`, `length`, `distance`,
+  `numCoordinates`, `numGeometries`), string representation, and nil-safety for all types.
+
+### Changed
+
+- `Geometry` refactored to a pure base type; concrete subtypes now carry all
+  type-specific logic. `geometry.nim` retains lifecycle hooks, shared accessors
+  (`isEmpty`, `isValid`, `type`, `area`, `length`, `distance`), and the `clone` proc.
+- WKT serialization extracted from `geometry.nim` into the dedicated
+  `serializers/wkt.nim` module.
+
+---
+
+## [0.0.0] - 2026-03-27 — Initial scaffold
+
+- Package scaffold: `nimgeos.nimble`, `src/nimgeos.nim`, directory layout.
+- `GeosContext` — thread-local GEOS context lifecycle wrapper with deterministic
+  destruction via ORC and a notice/error message handler pair.
+- Base `Geometry` ref type with ORC-safe lifecycle hooks (`=destroy`, `=copy`, `=dup`)
+  delegating to `GEOSGeom_destroy_r` and `GEOSGeom_clone_r`.
+- `errors.nim` — `GeosError`, `GeosInitError`, `GeosGeomError`, `GeosParseError`.
+- `geos_abi.nim` — raw FFI bindings to `libgeos_c` covering context management,
+  geometry construction/destruction, property accessors, spatial predicates, and
+  spatial operations.
+- Smoke test (`t_geos_abi_smoke.nim`) and initial context/geometry test stubs.

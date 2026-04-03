@@ -3,7 +3,7 @@
 ## - Used as Polygon shell and holes.
 ## - Not typically created directly by end users.
 
-import ../geos_abi
+import ../private/geos_abi
 import ../context
 import ../errors
 import ../geometry
