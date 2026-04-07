@@ -12,6 +12,8 @@ import nimgeos/geometries/factories
 import nimgeos/serializers/wkt
 ## Predicates
 import nimgeos/spatial_predicates
+## Spatial Operations
+import nimgeos/spatial_operations
 
 export errors
 export context
@@ -27,3 +29,5 @@ export factories
 export wkt
 ## Predicates
 export spatial_predicates
+## Spatial Operations
+export spatial_operations

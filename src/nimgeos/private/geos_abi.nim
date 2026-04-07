@@ -111,7 +111,7 @@ proc GEOSBuffer_r*(ctx: GEOSContextHandle_t;
                     quadsegs: cint): GEOSGeometry {.geosImport.}
 proc GEOSConvexHull_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
 proc GEOSEnvelope_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
-proc GEOSCentroid_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; centroid: ptr GEOSGeometry): cint {.geosImport.}
+proc GEOSGetCentroid_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
 
 # ── Metrics ───────────────────────────────────────────────────────────────────
 proc GEOSArea_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; area: ptr cdouble): cint {.geosImport.}

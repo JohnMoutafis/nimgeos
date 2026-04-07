@@ -1,5 +1,5 @@
 # Package
-version       = "0.3.0"
+version       = "0.4.0"
 author        = "John Moutafis"
 description   = "Nim wrapper for the GEOS geometry engine (libgeos_c)"
 license       = "MIT"
@@ -30,5 +30,8 @@ task testGeometries, "Run geometry tests":
     echo "Running: " & file
     exec "nim r --hints:off " & file
 
-task testSpatialPredicates, "Run predicate tests":
+task testPredicates, "Run predicate tests":
   exec "nim r --hints:off tests/t_spatial_predicates.nim"
+
+task testSpatialOperations, "Run spatial operation tests":
+  exec "nim r --hints:off tests/t_spatial_operations.nim"

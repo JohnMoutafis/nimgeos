@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2026-04-07
+
+### Added
+
+- **Spatial operations** — new module `src/nimgeos/spatial_operations.nim` exposing 7 idiomatic
+  Nim wrapper procs over the GEOS spatial operation functions:
+  - **Binary** — `intersection`, `union`, `difference`: take two `Geometry` arguments and return
+    a new `Geometry` representing the result of the set operation.
+  - **Unary** — `convexHull`, `envelope`, `centroid`: take a single `Geometry` and return a new
+    derived `Geometry`.
+  - **Unary + params** — `buffer(g, width, quadsegs=8)`: expands or shrinks a geometry by the
+    given width; `quadsegs` controls arc approximation quality.
+  - All results are dispatched through `geomFromHandle` and returned as the correct concrete
+    subtype (e.g. `centroid` always returns a `Point`).
+  - `GeosGeomError` is raised on nil input or when GEOS returns a nil handle.
+- **Spatial operations test suite** — `tests/t_spatial_operations.nim` with 57 tests across
+  8 suites: one suite per operation (7) and a cross-operation relationships suite validating
+  geometric invariants (union/intersection/difference area laws, envelope and hull containment).
+- **`testSpatialOperations` nimble task** — convenience shortcut for running spatial operation
+  tests only.
+
+### Fixed
+
+- `GEOSCentroid_r` binding in `src/nimgeos/private/geos_abi.nim` was incorrect: wrong function
+  name (`GEOSCentroid_r` instead of `GEOSGetCentroid_r`) and wrong signature (out-parameter
+  `ptr GEOSGeometry` + `cint` return instead of a direct `GEOSGeometry` return). Corrected to
+  match the real GEOS C API.
+
+---
+
 ## [0.3.0] - 2026-04-03
 
 ### Added
