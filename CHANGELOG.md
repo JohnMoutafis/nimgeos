@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-04-08
+
+### Added
+
+- **WKB writer config ABI bindings** — `GEOSWKBWriter_setByteOrder_r`,
+  `GEOSWKBWriter_getByteOrder_r`, `GEOSWKBWriter_setOutputDimension_r`,
+  `GEOSWKBWriter_getOutputDimension_r`, `GEOSWKBWriter_setIncludeSRID_r` added to
+  `src/nimgeos/private/geos_abi.nim`.
+- **WKB serializer** — new module `src/nimgeos/serializers/wkb.nim` for WKB (Well-Known Binary)
+  geometry encoding:
+  - `fromWKB(ctx, bytes)` — parse a `seq[byte]`/`openArray[byte]` into a concrete `Geometry`.
+  - `toWKB(g, byteOrder)` — serialize any `Geometry` to `seq[byte]` with configurable byte
+    order (Little-Endian NDR default, Big-Endian XDR optional).
+  - `toHexWKB(g, byteOrder)` — hex-encoded WKB string for PostGIS interop and debugging.
+  - `fromHexWKB(ctx, hex)` — parse a hex-encoded WKB string.
+  - `WkbByteOrder` enum — type-safe byte order selection (`wkbNDR`, `wkbXDR`).
+- **WKB test suite** — `tests/test_serializers/t_wkb.nim` with tests for:
+  round-trip, property preservation, byte order, hex encoding, deserialization errors,
+  and cross-format invariants.
+
+---
+
 ## [0.4.0] - 2026-04-07
 
 ### Added

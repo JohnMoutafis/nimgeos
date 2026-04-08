@@ -65,24 +65,16 @@ proc GEOSGeom_createCollection_r*(ctx: GEOSContextHandle_t;
 # ── CoordSequence ─────────────────────────────────────────────────────────────
 proc GEOSCoordSeq_create_r*(ctx: GEOSContextHandle_t; size, dims: cuint): GEOSCoordSequence {.geosImport.}
 proc GEOSCoordSeq_destroy_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence) {.geosImport.}
-proc GEOSCoordSeq_setX_r*(ctx: GEOSContextHandle_t;
-                           s: GEOSCoordSequence; idx: cuint;
-                           val: cdouble): cint {.geosImport.}
-proc GEOSCoordSeq_setY_r*(ctx: GEOSContextHandle_t;
-                           s: GEOSCoordSequence; idx: cuint;
-                           val: cdouble): cint {.geosImport.}
-proc GEOSCoordSeq_setZ_r*(ctx: GEOSContextHandle_t;
-                           s: GEOSCoordSequence; idx: cuint;
-                           val: cdouble): cint {.geosImport.}
+proc GEOSCoordSeq_setX_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; idx: cuint; val: cdouble): cint {.geosImport.}
+proc GEOSCoordSeq_setY_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; idx: cuint; val: cdouble): cint {.geosImport.}
+proc GEOSCoordSeq_setZ_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; idx: cuint; val: cdouble): cint {.geosImport.}
 proc GEOSCoordSeq_getX_r*(ctx: GEOSContextHandle_t;
                            s: GEOSCoordSequence; idx: cuint;
                            val: ptr cdouble): cint {.geosImport.}
 proc GEOSCoordSeq_getY_r*(ctx: GEOSContextHandle_t;
                            s: GEOSCoordSequence; idx: cuint;
                            val: ptr cdouble): cint {.geosImport.}
-proc GEOSCoordSeq_getSize_r*(ctx: GEOSContextHandle_t;
-                              s: GEOSCoordSequence;
-                              size: ptr cuint): cint {.geosImport.}
+proc GEOSCoordSeq_getSize_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; size: ptr cuint): cint {.geosImport.}
 
 # ── Geometry type queries ─────────────────────────────────────────────────────
 proc GEOSGeomTypeId_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}
@@ -116,27 +108,17 @@ proc GEOSGetCentroid_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry
 # ── Metrics ───────────────────────────────────────────────────────────────────
 proc GEOSArea_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; area: ptr cdouble): cint {.geosImport.}
 proc GEOSLength_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; len: ptr cdouble): cint {.geosImport.}
-proc GEOSDistance_r*(ctx: GEOSContextHandle_t;
-                     g1, g2: GEOSGeometry;
-                     dist: ptr cdouble): cint {.geosImport.}
+proc GEOSDistance_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry; dist: ptr cdouble): cint {.geosImport.}
 
 # ── WKT I/O ───────────────────────────────────────────────────────────────────
 proc GEOSWKTReader_create_r*(ctx: GEOSContextHandle_t): GEOSWKTReader {.geosImport.}
 proc GEOSWKTReader_destroy_r*(ctx: GEOSContextHandle_t; r: GEOSWKTReader) {.geosImport.}
-proc GEOSWKTReader_read_r*(ctx: GEOSContextHandle_t;
-                            r: GEOSWKTReader;
-                            wkt: cstring): GEOSGeometry {.geosImport.}
+proc GEOSWKTReader_read_r*(ctx: GEOSContextHandle_t; r: GEOSWKTReader; wkt: cstring): GEOSGeometry {.geosImport.}
 proc GEOSWKTWriter_create_r*(ctx: GEOSContextHandle_t): GEOSWKTWriter {.geosImport.}
 proc GEOSWKTWriter_destroy_r*(ctx: GEOSContextHandle_t; w: GEOSWKTWriter) {.geosImport.}
-proc GEOSWKTWriter_write_r*(ctx: GEOSContextHandle_t;
-                             w: GEOSWKTWriter;
-                             g: GEOSGeometry): cstring {.geosImport.}
-proc GEOSWKTWriter_setTrim_r*(ctx: GEOSContextHandle_t;
-                               w: GEOSWKTWriter;
-                               trim: cint) {.geosImport.}
-proc GEOSWKTWriter_setRoundingPrecision_r*(ctx: GEOSContextHandle_t;
-                                            w: GEOSWKTWriter;
-                                            precision: cint) {.geosImport.}
+proc GEOSWKTWriter_write_r*(ctx: GEOSContextHandle_t; w: GEOSWKTWriter; g: GEOSGeometry): cstring {.geosImport.}
+proc GEOSWKTWriter_setTrim_r*(ctx: GEOSContextHandle_t; w: GEOSWKTWriter; trim: cint) {.geosImport.}
+proc GEOSWKTWriter_setRoundingPrecision_r*(ctx: GEOSContextHandle_t; w: GEOSWKTWriter; precision: cint) {.geosImport.}
 
 # ── WKB I/O ───────────────────────────────────────────────────────────────────
 proc GEOSWKBReader_create_r*(ctx: GEOSContextHandle_t): GEOSWKBReader {.geosImport.}
@@ -151,6 +133,11 @@ proc GEOSWKBWriter_write_r*(ctx: GEOSContextHandle_t;
                              w: GEOSWKBWriter;
                              g: GEOSGeometry;
                              size: ptr csize_t): ptr uint8 {.geosImport.}
+proc GEOSWKBWriter_setByteOrder_r*(ctx: GEOSContextHandle_t; w: GEOSWKBWriter; order: cint) {.geosImport.}
+proc GEOSWKBWriter_getByteOrder_r*(ctx: GEOSContextHandle_t; w: GEOSWKBWriter): cint {.geosImport.}
+proc GEOSWKBWriter_setOutputDimension_r*(ctx: GEOSContextHandle_t; w: GEOSWKBWriter; dim: cint) {.geosImport.}
+proc GEOSWKBWriter_getOutputDimension_r*(ctx: GEOSContextHandle_t; w: GEOSWKBWriter): cint {.geosImport.}
+proc GEOSWKBWriter_setIncludeSRID_r*(ctx: GEOSContextHandle_t; w: GEOSWKBWriter; include_srid: cint) {.geosImport.}
 
 # ── Point coordinate getters ──────────────────────────────────────────────────
 proc GEOSGeomGetX_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; x: ptr cdouble): cint {.geosImport.}
