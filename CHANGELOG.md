@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-04-20
+
+### Added
+
+- **GitHub Actions CI pipeline** — `.github/workflows/ci.yml` runs the full test
+  suite (`nimble test`) on every push to `main` and on all pull requests.
+  - OS matrix: Ubuntu, macOS.
+  - Nim version matrix: stable, devel (devel is allow-failure).
+- **CI status badge** in `README.md`.
+
+---
+
 ## [0.5.0] - 2026-04-08
 
 ### Added

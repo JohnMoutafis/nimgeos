@@ -1,5 +1,7 @@
 # nimgeos
 
+[![CI](https://github.com/JohnMoutafis/nimgeos/actions/workflows/ci.yml/badge.svg)](https://github.com/JohnMoutafis/nimgeos/actions/workflows/ci.yml)
+
 Nim wrapper for the [GEOS](https://libgeos.org/) geometry engine (`libgeos_c`).
 
 Build and manipulate 2D/3D geometries — points, linestrings, polygons,
