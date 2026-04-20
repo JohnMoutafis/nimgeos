@@ -27,10 +27,10 @@ jobs:
 
       - name: Install libgeos (macOS)
         if: runner.os == 'macOS'
-        run: brew install geos
-
-      - name: Build
-        run: nimble build -y
+        run: |
+          brew install geos
+          echo "LIBRARY_PATH=$(brew --prefix geos)/lib" >> $GITHUB_ENV
+          echo "C_INCLUDE_PATH=$(brew --prefix geos)/include" >> $GITHUB_ENV
 
       - name: Test
         run: nimble test

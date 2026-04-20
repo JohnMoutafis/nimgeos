@@ -10,11 +10,11 @@ import ./geometry
 
 proc evalPredicate(g, other: Geometry; label: string;
                    fn: proc(ctx: GEOSContextHandle_t;
-                            a, b: GEOSGeometry): cint
+                            a, b: GEOSGeometry): cchar
                             {.cdecl, raises: [], gcsafe.}): bool {.inline.} =
   g.checkHandle(label & " g")
   other.checkHandle(label & " other")
-  let rc = fn(g.ctx.handle, g.handle, other.handle)
+  let rc = ord(fn(g.ctx.handle, g.handle, other.handle))
   if rc == 2:
     raise newException(GeosGeomError, label & " failed (GEOS returned exception)")
   return rc == 1

@@ -84,11 +84,11 @@ proc type*(g: Geometry): GeomType =
 
 proc isEmpty*(g: Geometry): bool =
   g.checkHandle("isEmpty")
-  return GEOSisEmpty_r(g.ctx.handle, g.handle) == 1
+  return ord(GEOSisEmpty_r(g.ctx.handle, g.handle)) == 1
 
 proc isValid*(g: Geometry): bool =
   g.checkHandle("isValid")
-  return GEOSisValid_r(g.ctx.handle, g.handle) == 1
+  return ord(GEOSisValid_r(g.ctx.handle, g.handle)) == 1
 
 proc numCoordinates*(g: Geometry): int =
   g.checkHandle("numCoordinates")

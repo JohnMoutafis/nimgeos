@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.1] - 2026-04-20
+
+### Fixed
+
+- **ABI return-type mismatch for boolean GEOS functions** — 10 functions in
+  `src/nimgeos/private/geos_abi.nim` were declared as returning `cint` but the
+  underlying GEOS C API returns `char`. This caused `isEmpty()` and spatial predicates to return incorrect results on some platforms due to garbage in the upper bytes of the return register. 
+  Changed the return type to `cchar` and wrapped callers with `ord()` for correct integer comparison. Affected functions: 
+  - `GEOSisEmpty_r`
+  - `GEOSisValid_r`
+  - `GEOSEquals_r`
+  - `GEOSIntersects_r`
+  - `GEOSContains_r`
+  - `GEOSTouches_r`
+  - `GEOSWithin_r`
+  - `GEOSDisjoint_r`
+  - `GEOSCrosses_r`
+  - `GEOSOverlaps_r`
+- **CI: macOS ARM linker failure** — Homebrew on ARM runners installs to
+  `/opt/homebrew` which is not in the default search paths. The CI workflow now
+  exports `LIBRARY_PATH` and `C_INCLUDE_PATH` via `GITHUB_ENV` so the
+  linker and compiler find `libgeos_c`.
+
+---
+
 ## [0.6.0] - 2026-04-20
 
 ### Added

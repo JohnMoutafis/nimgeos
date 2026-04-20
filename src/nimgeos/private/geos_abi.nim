@@ -80,18 +80,18 @@ proc GEOSCoordSeq_getSize_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; siz
 proc GEOSGeomTypeId_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}
 proc GEOSGetNumGeometries_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}
 proc GEOSGetNumCoordinates_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}
-proc GEOSisEmpty_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}
-proc GEOSisValid_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}
+proc GEOSisEmpty_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cchar {.geosImport.}
+proc GEOSisValid_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cchar {.geosImport.}
 
 # ── Spatial predicates ────────────────────────────────────────────────────────
-proc GEOSEquals_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSIntersects_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSContains_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSTouches_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSWithin_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSDisjoint_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSCrosses_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
-proc GEOSOverlaps_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cint {.geosImport.}
+proc GEOSEquals_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSIntersects_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSContains_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSTouches_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSWithin_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSDisjoint_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSCrosses_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
+proc GEOSOverlaps_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.geosImport.}
 
 # ── Spatial operations ────────────────────────────────────────────────────────
 proc GEOSIntersection_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): GEOSGeometry {.geosImport.}
