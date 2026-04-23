@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2026-04-21
+
+### Added
+
+- **GeoJSON Serialization**: New `serializers/geojson.nim` provides:
+  - `toGeoJSON(g: Geometry)` — Serialize geometries as GeoJSON `geometry` object strings.
+  - `fromGeoJSON(ctx, json)` — Parse GeoJSON `geometry` strings into `Geometry` objects.
+- **ABI bindings**: Added `GEOSCoordSeq_getZ_r`, `GEOSCoordSeq_getDimensions_r`, and `GEOSGeom_getCoordSeq_r` to `geos_abi.nim`.
+- **Tests**: `tests/test_serializers/t_geojson.nim` with round-trip, validation, error cases, 3D geometry, cross-format invariants, and edge case tests.
+
+---
+
 ## [0.6.1] - 2026-04-20
 
 ### Fixed

@@ -11,6 +11,7 @@ import nimgeos/geometries/factories
 ## Serializers
 import nimgeos/serializers/wkt
 import nimgeos/serializers/wkb
+import nimgeos/serializers/geojson
 ## Predicates
 import nimgeos/spatial_predicates
 ## Spatial Operations
@@ -29,6 +30,7 @@ export factories
 ## Serializers
 export wkt
 export wkb
+export geojson
 ## Predicates
 export spatial_predicates
 ## Spatial Operations

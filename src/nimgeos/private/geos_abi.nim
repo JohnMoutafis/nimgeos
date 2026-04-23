@@ -75,6 +75,11 @@ proc GEOSCoordSeq_getY_r*(ctx: GEOSContextHandle_t;
                            s: GEOSCoordSequence; idx: cuint;
                            val: ptr cdouble): cint {.geosImport.}
 proc GEOSCoordSeq_getSize_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; size: ptr cuint): cint {.geosImport.}
+proc GEOSCoordSeq_getZ_r*(ctx: GEOSContextHandle_t;
+                           s: GEOSCoordSequence; idx: cuint;
+                           val: ptr cdouble): cint {.geosImport.}
+proc GEOSCoordSeq_getDimensions_r*(ctx: GEOSContextHandle_t; s: GEOSCoordSequence; dims: ptr cuint): cint {.geosImport.}
+proc GEOSGeom_getCoordSeq_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSCoordSequence {.geosImport.}
 
 # ── Geometry type queries ─────────────────────────────────────────────────────
 proc GEOSGeomTypeId_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): cint {.geosImport.}

@@ -1,5 +1,5 @@
 # Package
-version       = "0.6.1"
+version       = "0.7.0"
 author        = "John Moutafis"
 description   = "Nim wrapper for the GEOS geometry engine (libgeos_c)"
 license       = "MIT"
