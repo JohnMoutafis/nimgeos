@@ -1,5 +1,5 @@
 # Package
-version       = "0.7.0"
+version       = "0.8.0"
 author        = "John Moutafis"
 description   = "Nim wrapper for the GEOS geometry engine (libgeos_c)"
 license       = "MIT"
@@ -35,3 +35,6 @@ task testPredicates, "Run predicate tests":
 
 task testSpatialOperations, "Run spatial operation tests":
   exec "nim r --hints:off tests/t_spatial_operations.nim"
+
+task testPreparedGeom, "Run tests for prepared geometry":
+  exec "nim r --hints:off tests/t_prepared_geometry.nim"

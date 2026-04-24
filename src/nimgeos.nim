@@ -8,6 +8,7 @@ import nimgeos/geometries/linearring
 import nimgeos/geometries/polygon
 import nimgeos/geometries/multi
 import nimgeos/geometries/factories
+import nimgeos/geometries/prepared
 ## Serializers
 import nimgeos/serializers/wkt
 import nimgeos/serializers/wkb
@@ -27,6 +28,7 @@ export linearring
 export polygon
 export multi
 export factories
+export prepared
 ## Serializers
 export wkt
 export wkb

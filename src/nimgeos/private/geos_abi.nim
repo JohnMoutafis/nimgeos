@@ -11,14 +11,15 @@
 # ── Opaque handle types ───────────────────────────────────────────────────────
 # distinct pointer prevents accidental cross-type assignment at compile time
 type
-  GEOSContextHandle_t* = distinct pointer
-  GEOSGeometry*        = distinct pointer
-  GEOSCoordSequence*   = distinct pointer
-  GEOSWKTReader*       = distinct pointer
-  GEOSWKTWriter*       = distinct pointer
-  GEOSWKBReader*       = distinct pointer
-  GEOSWKBWriter*       = distinct pointer
-  GEOSSTRtree*         = distinct pointer
+  GEOSContextHandle_t*  = distinct pointer
+  GEOSGeometry*         = distinct pointer
+  GEOSPreparedGeometry* = distinct pointer
+  GEOSCoordSequence*    = distinct pointer
+  GEOSWKTReader*        = distinct pointer
+  GEOSWKTWriter*        = distinct pointer
+  GEOSWKBReader*        = distinct pointer
+  GEOSWKBWriter*        = distinct pointer
+  GEOSSTRtree*          = distinct pointer
 
 # ── Message handler callback type ─────────────────────────────────────────────
 type
@@ -102,13 +103,37 @@ proc GEOSOverlaps_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): cchar {.ge
 proc GEOSIntersection_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): GEOSGeometry {.geosImport.}
 proc GEOSUnion_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): GEOSGeometry {.geosImport.}
 proc GEOSDifference_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry): GEOSGeometry {.geosImport.}
+proc GEOSSymmetricDifference_r*(ctx: GEOSContextHandle_t; 
+                                g1, g2: GEOSGeometry): GEOSGeometry {.importc: "GEOSSymDifference_r", 
+                                                                      cdecl, raises: [], gcsafe.}
+proc GEOSUnaryUnion_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
 proc GEOSBuffer_r*(ctx: GEOSContextHandle_t;
                     g: GEOSGeometry;
                     width: cdouble;
                     quadsegs: cint): GEOSGeometry {.geosImport.}
+proc GEOSSimplify_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; tolerance: cdouble): GEOSGeometry {.geosImport.}
+proc GEOSTopologyPreserveSimplify_r*(ctx: GEOSContextHandle_t; 
+                                      g: GEOSGeometry; tolerance: cdouble): GEOSGeometry {.geosImport.}
+proc GEOSSnap_r*(ctx: GEOSContextHandle_t; g1, g2: GEOSGeometry; tolerance: cdouble): GEOSGeometry {.geosImport.}
 proc GEOSConvexHull_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
 proc GEOSEnvelope_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
 proc GEOSGetCentroid_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
+proc GEOSBoundary_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry): GEOSGeometry {.geosImport.}
+
+# ── Prepared geometry ─────────────────────────────────────────────────────────
+proc GEOSPreparedGeom_create_r*(ctx: GEOSContextHandle_t; 
+                                 g: GEOSGeometry): GEOSPreparedGeometry {.importc: "GEOSPrepare_r", 
+                                                                          cdecl, raises: [], gcsafe.}
+# Note: unlike GEOSPrepare_r (create), the destroy symbol actually IS named
+# GEOSPreparedGeom_destroy_r in the GEOS C API, so geosImport (importc) works.
+proc GEOSPreparedGeom_destroy_r*(ctx: GEOSContextHandle_t; prep: GEOSPreparedGeometry) {.geosImport.}
+proc GEOSPreparedContains_r*(ctx: GEOSContextHandle_t; 
+                              prep: GEOSPreparedGeometry; g: GEOSGeometry): cchar {.geosImport.}
+proc GEOSPreparedIntersects_r*(ctx: GEOSContextHandle_t; 
+                                prep: GEOSPreparedGeometry; g: GEOSGeometry): cchar {.geosImport.}
+proc GEOSPreparedCovers_r*(ctx: GEOSContextHandle_t; prep: GEOSPreparedGeometry; g: GEOSGeometry): cchar {.geosImport.}
+proc GEOSPreparedCoveredBy_r*(ctx: GEOSContextHandle_t; 
+                               prep: GEOSPreparedGeometry; g: GEOSGeometry): cchar {.geosImport.}
 
 # ── Metrics ───────────────────────────────────────────────────────────────────
 proc GEOSArea_r*(ctx: GEOSContextHandle_t; g: GEOSGeometry; area: ptr cdouble): cint {.geosImport.}

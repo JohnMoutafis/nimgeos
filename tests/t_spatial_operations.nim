@@ -18,6 +18,11 @@ const lineCollinear = "LINESTRING (0 0, 2 2, 4 4)"  # collinear — hull is a Li
 const triangleWKT = "POLYGON ((0 0, 4 0, 2 3, 0 0))" # centroid at (2.0, 1.0)
 const pointA      = "POINT (2 3)"
 
+const lineDense     = "LINESTRING (0 0, 0.5 0.1, 1 0, 1.5 -0.1, 2 0, 2.5 0.1, 3 0, 3.5 -0.1, 4 0)"
+const polyWithHole  = "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (3 3, 7 3, 7 7, 3 7, 3 3))"
+const linesForSnapA = "LINESTRING (0 0, 1 1, 2 2)"
+const linesForSnapB = "LINESTRING (0 0.25, 1 1.25, 2 2.25)"
+
 # ── intersection ──────────────────────────────────────────────────────────────
 
 suite "intersection":
@@ -377,3 +382,233 @@ suite "Operation relationships":
     var ctx = initGeosContext()
     let poly = ctx.fromWKT(polyCShape)
     check poly.convexHull().contains(poly)
+
+# ── simplify ──────────────────────────────────────────────────────────────────
+
+suite "simplify":
+  test "simplify preserves validity for simple polygon":
+    var ctx = initGeosContext()
+    let p = ctx.fromWKT(polyA)
+    let s = p.simplify(0.25)
+    check s.isValid()
+
+  test "simplify reduces coordinate count on dense line":
+    var ctx = initGeosContext()
+    let l = ctx.fromWKT(lineDense)
+    let s = l.simplify(0.2)
+    check s.numCoordinates() < l.numCoordinates()
+
+  test "simplify with zero tolerance is topologically equal":
+    var ctx = initGeosContext()
+    let g = ctx.fromWKT(lineDense)
+    check g.equals(g.simplify(0.0))
+
+  test "simplify with larger tolerance simplifies at least as much":
+    var ctx = initGeosContext()
+    let g = ctx.fromWKT(lineDense)
+    let lo = g.simplify(0.05)
+    let hi = g.simplify(0.3)
+    check hi.numCoordinates() <= lo.numCoordinates()
+
+  test "Nil Safety: g nil raises GeosGeomError":
+    var g: Geometry
+    expect GeosGeomError:
+      discard g.simplify(1.0)
+
+# ── topologyPreserveSimplify ──────────────────────────────────────────────────
+
+suite "topologyPreserveSimplify":
+  test "topology-preserving simplify keeps polygon valid":
+    var ctx = initGeosContext()
+    let p = ctx.fromWKT(polyWithHole)
+    let s = p.topologyPreserveSimplify(0.6)
+    check s.isValid()
+
+  test "topology-preserving simplify keeps hole count":
+    var ctx = initGeosContext()
+    let p = Polygon(ctx.fromWKT(polyWithHole))
+    let s = Polygon(p.topologyPreserveSimplify(0.6))
+    check s.numInteriorRings() == p.numInteriorRings()
+
+  test "topology-preserving simplify reduces coordinate count on dense line":
+    var ctx = initGeosContext()
+    let l = ctx.fromWKT(lineDense)
+    let s = l.topologyPreserveSimplify(0.2)
+    check s.numCoordinates() < l.numCoordinates()
+
+  test "topology-preserving simplify with zero tolerance is equal":
+    var ctx = initGeosContext()
+    let g = ctx.fromWKT(polyA)
+    check g.equals(g.topologyPreserveSimplify(0.0))
+
+  test "Nil Safety: g nil raises GeosGeomError":
+    var g: Geometry
+    expect GeosGeomError:
+      discard g.topologyPreserveSimplify(1.0)
+
+# ── symmetricDifference ───────────────────────────────────────────────────────
+
+suite "symmetricDifference":
+  test "symmetric difference of overlapping polygons is non-empty":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(polyA)
+    let b = ctx.fromWKT(polyB)
+    check not a.symmetricDifference(b).isEmpty()
+
+  test "symmetric difference is commutative":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(polyA)
+    let b = ctx.fromWKT(polyB)
+    check a.symmetricDifference(b).equals(b.symmetricDifference(a))
+
+  test "symmetric difference area matches union minus intersection":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(polyA)
+    let b = ctx.fromWKT(polyB)
+    let lhs = a.symmetricDifference(b).area()
+    let rhs = a.union(b).area() - a.intersection(b).area()
+    check abs(lhs - rhs) < 1e-9
+
+  test "symmetric difference with itself is empty":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(polyA)
+    check a.symmetricDifference(a).isEmpty()
+
+  test "Nil Safety: g nil raises GeosGeomError":
+    var a: Geometry
+    var ctx = initGeosContext()
+    let b = ctx.fromWKT(polyA)
+    expect GeosGeomError:
+      discard a.symmetricDifference(b)
+
+# ── unaryUnion ────────────────────────────────────────────────────────────────
+
+suite "unaryUnion":
+  test "unaryUnion dissolves overlapping multipolygon":
+    var ctx = initGeosContext()
+    let m = ctx.fromWKT("MULTIPOLYGON (((0 0, 4 0, 4 4, 0 4, 0 0)), ((2 2, 6 2, 6 6, 2 6, 2 2)))")
+    let u = m.unaryUnion()
+    check u.area() < m.area()
+    check u.isValid()
+
+  test "unaryUnion preserves area for disjoint multipolygon":
+    var ctx = initGeosContext()
+    let m = ctx.fromWKT("MULTIPOLYGON (((0 0, 2 0, 2 2, 0 2, 0 0)), ((3 3, 5 3, 5 5, 3 5, 3 3)))")
+    check abs(m.unaryUnion().area() - m.area()) < 1e-9
+
+  test "unaryUnion of geometry collection is valid":
+    var ctx = initGeosContext()
+    let c = ctx.fromWKT("GEOMETRYCOLLECTION (LINESTRING (0 0, 3 3), LINESTRING (0 3, 3 0))")
+    check c.unaryUnion().isValid()
+
+  test "unaryUnion of empty collection is empty":
+    var ctx = initGeosContext()
+    let c = ctx.fromWKT("GEOMETRYCOLLECTION EMPTY")
+    check c.unaryUnion().isEmpty()
+
+  test "Nil Safety: g nil raises GeosGeomError":
+    var g: Geometry
+    expect GeosGeomError:
+      discard g.unaryUnion()
+
+# ── snap ──────────────────────────────────────────────────────────────────────
+
+suite "snap":
+  test "snap with zero tolerance keeps source geometry":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(linesForSnapA)
+    let b = ctx.fromWKT(linesForSnapB)
+    check a.equals(a.snap(b, 0.0))
+
+  test "snap with larger tolerance moves geometry closer to target":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(linesForSnapA)
+    let b = ctx.fromWKT(linesForSnapB)
+    let loose = a.snap(b, 0.5)
+    check loose.distance(b) < a.distance(b)
+
+  test "snap with increasing tolerance does not increase distance":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(linesForSnapA)
+    let b = ctx.fromWKT(linesForSnapB)
+    let t1 = a.snap(b, 0.1)
+    let t2 = a.snap(b, 0.5)
+    check t2.distance(b) <= t1.distance(b)
+
+  test "snap result is valid":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(linesForSnapA)
+    let b = ctx.fromWKT(linesForSnapB)
+    check a.snap(b, 0.5).isValid()
+
+  test "Nil Safety: g nil raises GeosGeomError":
+    var a: Geometry
+    var ctx = initGeosContext()
+    let b = ctx.fromWKT(linesForSnapB)
+    expect GeosGeomError:
+      discard a.snap(b, 0.5)
+
+# ── boundaryOp ────────────────────────────────────────────────────────────────
+
+suite "boundaryOp":
+  test "boundary of polygon is linestring or multiline":
+    var ctx = initGeosContext()
+    let p = ctx.fromWKT(polyA)
+    let b = p.boundaryOp()
+    check (b of LineString) or (b of MultiLineString)
+
+  test "boundary of linestring is two endpoints":
+    var ctx = initGeosContext()
+    let l = LineString(ctx.fromWKT("LINESTRING (0 0, 2 2, 4 4)"))
+    let b = l.boundaryOp()
+    check b of MultiPoint
+    check b.numGeometries() == 2
+
+  test "boundary of point is empty":
+    var ctx = initGeosContext()
+    let p = ctx.fromWKT("POINT (1 1)")
+    check p.boundaryOp().isEmpty()
+
+  test "boundary of empty point is empty":
+    var ctx = initGeosContext()
+    let g = ctx.fromWKT("POINT EMPTY")
+    check g.boundaryOp().isEmpty()
+
+  test "Nil Safety: g nil raises GeosGeomError":
+    var g: Geometry
+    expect GeosGeomError:
+      discard g.boundaryOp()
+
+# ── Extended operation invariants ─────────────────────────────────────────────
+
+suite "Extended operation invariants":
+  test "A xor B equals B xor A":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(polyA)
+    let b = ctx.fromWKT(polyB)
+    check a.symmetricDifference(b).equals(b.symmetricDifference(a))
+
+  test "point boundary is empty set":
+    var ctx = initGeosContext()
+    let p = ctx.fromWKT("POINT (0 0)")
+    check p.boundaryOp().isEmpty()
+
+  test "hole structure survives topology-preserving simplify":
+    var ctx = initGeosContext()
+    let p = Polygon(ctx.fromWKT(polyWithHole))
+    let s = Polygon(p.topologyPreserveSimplify(0.8))
+    check s.numInteriorRings() == p.numInteriorRings()
+
+  test "simplify may alter area but keeps finite area":
+    var ctx = initGeosContext()
+    let p = ctx.fromWKT(polyWithHole)
+    let s = p.simplify(0.8)
+    check s.area().classify != fcNan
+
+  test "symmetric difference and intersection have zero area overlap":
+    var ctx = initGeosContext()
+    let a = ctx.fromWKT(polyA)
+    let b = ctx.fromWKT(polyB)
+    let x = a.symmetricDifference(b)
+    let i = a.intersection(b)
+    check abs(x.intersection(i).area()) < 1e-9

@@ -33,6 +33,31 @@ proc evalUnaryOp(g: Geometry; label: string;
     raise newException(GeosGeomError, label & " failed (GEOS returned nil)")
   return geomFromHandle(g.ctx, handle)
 
+proc evalUnaryTolOp(g: Geometry; tol: float; label: string;
+                    fn: proc(ctx: GEOSContextHandle_t;
+                             a: GEOSGeometry;
+                             tolerance: cdouble): GEOSGeometry
+                             {.cdecl, raises: [], gcsafe.}): Geometry {.inline.} =
+  ## Helper for unary tolerance operations (simplify variants).
+  g.checkHandle(label)
+  let handle = fn(g.ctx.handle, g.handle, tol.cdouble)
+  if cast[pointer](handle) == nil:
+    raise newException(GeosGeomError, label & " failed (GEOS returned nil)")
+  return geomFromHandle(g.ctx, handle)
+
+proc evalBinaryTolOp(g, other: Geometry; tol: float; label: string;
+                     fn: proc(ctx: GEOSContextHandle_t;
+                              a, b: GEOSGeometry;
+                              tolerance: cdouble): GEOSGeometry
+                              {.cdecl, raises: [], gcsafe.}): Geometry {.inline.} =
+  ## Helper for binary tolerance operations (snap).
+  g.checkHandle(label & " g")
+  other.checkHandle(label & " other")
+  let handle = fn(g.ctx.handle, g.handle, other.handle, tol.cdouble)
+  if cast[pointer](handle) == nil:
+    raise newException(GeosGeomError, label & " failed (GEOS returned nil)")
+  return geomFromHandle(g.ctx, handle)
+
 # ── Binary operations ─────────────────────────────────────────────────────────
 
 proc intersection*(g, other: Geometry): Geometry =
@@ -46,6 +71,14 @@ proc union*(g, other: Geometry): Geometry =
 proc difference*(g, other: Geometry): Geometry =
   ## Returns the part of g that does not intersect other.
   evalBinaryOp(g, other, "difference", GEOSDifference_r)
+
+proc symmetricDifference*(g, other: Geometry): Geometry =
+  ## Returns geometry covered by exactly one input (exclusive-or).
+  evalBinaryOp(g, other, "symmetricDifference", GEOSSymmetricDifference_r)
+
+proc snap*(g, other: Geometry; tol: float): Geometry =
+  ## Snaps g vertices/segments toward other where within tolerance.
+  evalBinaryTolOp(g, other, tol, "snap", GEOSSnap_r)
 
 # ── Unary operations ──────────────────────────────────────────────────────────
 
@@ -69,3 +102,23 @@ proc envelope*(g: Geometry): Geometry =
 proc centroid*(g: Geometry): Geometry =
   ## Returns the geometric centre of the geometry as a Point.
   evalUnaryOp(g, "centroid", GEOSGetCentroid_r)
+
+proc simplify*(g: Geometry; tol: float): Geometry =
+  ## Simplifies geometry using Douglas-Peucker tolerance.
+  ## Higher tolerance removes more detail but may alter topology.
+  evalUnaryTolOp(g, tol, "simplify", GEOSSimplify_r)
+
+proc topologyPreserveSimplify*(g: Geometry; tol: float): Geometry =
+  ## Simplifies geometry while preserving topology.
+  ## Useful for polygons where validity must be retained.
+  evalUnaryTolOp(g, tol, "topologyPreserveSimplify", GEOSTopologyPreserveSimplify_r)
+
+proc unaryUnion*(g: Geometry): Geometry =
+  ## Computes a union over all components of a collection geometry.
+  ## For non-collections, GEOS returns an equivalent normalized geometry.
+  evalUnaryOp(g, "unaryUnion", GEOSUnaryUnion_r)
+
+proc boundaryOp*(g: Geometry): Geometry =
+  ## Returns the topological boundary of a geometry.
+  ## For points, boundary is empty; for polygons, boundary is ring(s).
+  evalUnaryOp(g, "boundaryOp", GEOSBoundary_r)

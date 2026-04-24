@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.0] - 2026-04-24
+
+### Added
+
+- **Extended spatial operations** — six new procs in `src/nimgeos/spatial_operations.nim`:
+  - `simplify(g, tol)` — reduce geometry detail using Douglas-Peucker tolerance.
+  - `topologyPreserveSimplify(g, tol)` — simplification that preserves topology (polygon validity, hole structure).
+  - `symmetricDifference(g, other)` — exclusive-or set operation between two geometries.
+  - `unaryUnion(g)` — dissolve/union all components of a collection geometry.
+  - `snap(g, other, tol)` — snap vertices of one geometry toward another within tolerance.
+  - `boundaryOp(g)` — extract the topological boundary of a geometry.
+- **Prepared geometry API** — new module `src/nimgeos/geometries/prepared.nim` providing high-performance spatial 
+  predicates via precomputed GEOS structures:
+  - `toPreparedGeometry(g)` — build an immutable `PreparedGeometry` from any `Geometry`.
+  - `preparedContains`, `preparedIntersects`, `preparedCovers`, `preparedCoveredBy` —
+    accelerated predicate checks against the prepared geometry.
+  - Ownership-safe: the source geometry is cloned internally so the prepared handle never outlives its backing data. 
+    Cleanup is deterministic via ORC finalization.
+  - Guard overloads raise `GeosGeomError` when callers accidentally pass a plain `Geometry`
+    instead of `PreparedGeometry`.
+- **ABI bindings** — `GEOSSimplify_r`, `GEOSTopologyPreserveSimplify_r`, `GEOSSnap_r`, `GEOSSymDifference_r`, 
+  `GEOSUnaryUnion_r`, `GEOSBoundary_r`, `GEOSPrepare_r`, `GEOSPreparedGeom_destroy_r`, `GEOSPreparedContains_r`, 
+  `GEOSPreparedIntersects_r`, `GEOSPreparedCovers_r`, `GEOSPreparedCoveredBy_r`, and the `GEOSPreparedGeometry` opaque
+  handle type added to `src/nimgeos/private/geos_abi.nim`.
+- **Prepared geometry test suite** — `tests/t_prepared_geometry.nim` with creation/lifecycle, correctness-parity, 
+  performance-sanity, and misuse-guard tests.
+- **`testPreparedGeom` nimble task** — convenience shortcut for running prepared geometry tests only.
+- **Spatial operations test suite extended** — `tests/t_spatial_operations.nim` now includes
+  suites for `simplify`, `topologyPreserveSimplify`, `symmetricDifference`, `unaryUnion`, `snap`, `boundaryOp`, 
+  and an "Extended operation invariants" suite covering commutativity, topology preservation, and area-overlap properties.
+
+---
+
 ## [0.7.0] - 2026-04-21
 
 ### Added
@@ -14,8 +47,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **GeoJSON Serialization**: New `serializers/geojson.nim` provides:
   - `toGeoJSON(g: Geometry)` — Serialize geometries as GeoJSON `geometry` object strings.
   - `fromGeoJSON(ctx, json)` — Parse GeoJSON `geometry` strings into `Geometry` objects.
-- **ABI bindings**: Added `GEOSCoordSeq_getZ_r`, `GEOSCoordSeq_getDimensions_r`, and `GEOSGeom_getCoordSeq_r` to `geos_abi.nim`.
-- **Tests**: `tests/test_serializers/t_geojson.nim` with round-trip, validation, error cases, 3D geometry, cross-format invariants, and edge case tests.
+- **ABI bindings**: Added `GEOSCoordSeq_getZ_r`, `GEOSCoordSeq_getDimensions_r`, 
+  and `GEOSGeom_getCoordSeq_r` to `geos_abi.nim`.
+- **Tests**: `tests/test_serializers/t_geojson.nim` with round-trip, validation, error cases, 3D geometry, cross-format 
+  invariants, and edge case tests.
 
 ---
 
@@ -25,8 +60,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **ABI return-type mismatch for boolean GEOS functions** — 10 functions in
   `src/nimgeos/private/geos_abi.nim` were declared as returning `cint` but the
-  underlying GEOS C API returns `char`. This caused `isEmpty()` and spatial predicates to return incorrect results on some platforms due to garbage in the upper bytes of the return register. 
-  Changed the return type to `cchar` and wrapped callers with `ord()` for correct integer comparison. Affected functions: 
+  underlying GEOS C API returns `char`. This caused `isEmpty()` and spatial predicates to return incorrect results on 
+  some platforms due to garbage in the upper bytes of the return register. Changed the return type to `cchar` and 
+  wrapped callers with `ord()` for correct integer comparison. Affected functions: 
   - `GEOSisEmpty_r`
   - `GEOSisValid_r`
   - `GEOSEquals_r`
