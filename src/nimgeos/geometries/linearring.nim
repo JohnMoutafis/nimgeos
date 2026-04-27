@@ -36,6 +36,7 @@ proc createLinearRing*(ctx: var GeosContext; coords: openArray[(float, float)]):
   ## Create a 2D LinearRing from an array of (x, y) tuples.
   ## coords must form a closed ring: first and last point must be equal.
   ## GEOS requires at least 4 points (3 unique + closing point).
+  checkContext(ctx, "createLinearRing")
   let sq = validateRingCoords(ctx, coords)
   let handle = GEOSGeom_createLinearRing_r(ctx.handle, sq)
   if cast[pointer](handle) == nil:
@@ -46,6 +47,7 @@ proc createLinearRing*(ctx: var GeosContext; coords: openArray[(float, float, fl
   ## Create a 3D LinearRing from an array of (x, y, z) tuples.
   ## coords must form a closed ring: first and last point must be equal.
   ## GEOS requires at least 4 points (3 unique + closing point).
+  checkContext(ctx, "createLinearRing")
   let sq = validateRingCoords(ctx, coords)
   let handle = GEOSGeom_createLinearRing_r(ctx.handle, sq)
   if cast[pointer](handle) == nil:

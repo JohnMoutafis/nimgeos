@@ -11,12 +11,14 @@ type
   Point*    = ref PointObj
 
 proc createPoint*(ctx: var GeosContext; x, y: float): Point =
+  checkContext(ctx, "createPoint")
   let handle = GEOSGeom_createPointFromXY_r(ctx.handle, x.cdouble, y.cdouble)
   if cast[pointer](handle) == nil:
     raise newException(GeosGeomError, "Failed to create Point")
   return Point(ctx: addr ctx, handle: handle)
 
 proc createPoint*(ctx: var GeosContext; x, y, z: float): Point =
+  checkContext(ctx, "createPoint")
   let sq = GEOSCoordSeq_create_r(ctx.handle, 1.cuint, 3.cuint)
   if cast[pointer](sq) == nil:
     raise newException(GeosGeomError, "Failed to create CoordSequence for Point")

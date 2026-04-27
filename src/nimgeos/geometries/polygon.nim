@@ -14,6 +14,7 @@ proc createPolygon*(ctx: var GeosContext; shell: LinearRing; holes: openArray[Li
   ## Create a Polygon from a shell LinearRing and optional hole LinearRings.
   ## Shell and all holes transfer ownership to the new Polygon.
   ## After creation, the passed-in ring handles are neutralised.
+  checkContext(ctx, "createPolygon")
   shell.checkHandle("createPolygon shell")
 
   if holes.len == 0:

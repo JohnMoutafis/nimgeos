@@ -9,6 +9,7 @@ import ../errors
 # -- WKT Deserialization ────────────────────────────────────────────────────────
 proc fromWKT*(ctx: var GeosContext; wkt: string): Geometry =
   ## Parse any WKT string into the corresponding concrete Geometry.
+  checkContext(ctx, "fromWKT")
   let reader = GEOSWKTReader_create_r(ctx.handle)
   if cast[pointer](reader) == nil:
     raise newException(GeosInitError, "Failed to create WKT reader")

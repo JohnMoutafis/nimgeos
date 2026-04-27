@@ -1,39 +1,56 @@
+## nimgeos — Nim wrapper for the GEOS geometry engine.
+##
+## Public API re-exports. Internal modules (``private/``, ``factories``) are
+## intentionally **not** re-exported.
+
+# ── Core ──────────────────────────────────────────────────────────────────────
 import nimgeos/errors
 import nimgeos/context
-## Geometries
+
+# ── Geometry types ────────────────────────────────────────────────────────────
 import nimgeos/geometry
 import nimgeos/geometries/point
 import nimgeos/geometries/linestring
 import nimgeos/geometries/linearring
 import nimgeos/geometries/polygon
 import nimgeos/geometries/multi
-import nimgeos/geometries/factories
 import nimgeos/geometries/prepared
-## Serializers
+import nimgeos/geometries/coord_seq
+
+# ── Base operations & iterators (geomN, items) ───────────────────────────────
+import nimgeos/geometry_base
+
+# ── Serializers ───────────────────────────────────────────────────────────────
 import nimgeos/serializers/wkt
 import nimgeos/serializers/wkb
 import nimgeos/serializers/geojson
-## Predicates
+
+# ── Predicates & spatial operations ───────────────────────────────────────────
 import nimgeos/spatial_predicates
-## Spatial Operations
 import nimgeos/spatial_operations
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Public exports — only user-facing modules are listed here.
+# `private/*` and `geometries/factories` are internal and NOT exported.
+# ══════════════════════════════════════════════════════════════════════════════
 
 export errors
 export context
-## Geometries
+## Geometry types
 export geometry
 export point
 export linestring
 export linearring
 export polygon
 export multi
-export factories
 export prepared
+export coord_seq
+## Base operations & iterators
+export geometry_base
 ## Serializers
 export wkt
 export wkb
 export geojson
-## Predicates
+## Predicates & spatial operations
 export spatial_predicates
-## Spatial Operations
 export spatial_operations

@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2025-07-18
+
+### Added
+
+- **Context lifetime safety** — new `withGeosContext` proc in `context.nim` provides scoped
+  `GeosContext` usage with automatic cleanup. Prevents use-after-free errors by ensuring the
+  context is destroyed when the scope exits.
+- **Nil-context guard** — new `checkContext` template in `context.nim` raises `GeosInitError`
+  when a destroyed or uninitialised `GeosContext` is passed to any constructor or deserializer.
+  Guards added to: `createPoint`, `createLineString`, `createLinearRing`, `createPolygon`,
+  `createMultiGeometry`, `newCoordSeq`, `fromWKT`, `fromWKB`, `fromHexWKB` (transitively),
+  and `fromGeoJSON`.
+- **`CoordSeq` utility** — new module `geometries/coord_seq.nim` wrapping `GEOSCoordSequence`
+  with a clean Nim abstraction:
+  - `newCoordSeq(ctx, size, dims)` — create a new coordinate sequence.
+  - `coordSeq(g)` — extract a cloned coordinate sequence from any Point, LineString, or LinearRing.
+  - `setX/setY/setZ`, `getX/getY/getZ` — individual coordinate access.
+  - `setCoord/getCoord/getCoord3D` — convenience tuple-based access.
+  - `len`, `dims` — property accessors.
+  - `clone()` — deep-copy producing an independent owned sequence.
+  - `$` — string representation.
+  - Ownership-safe: deterministic destruction via ORC, non-copyable.
+- **Multi-geometry iterators** — `items` iterators in `geometry_base.nim` for `for … in` syntax:
+  - `items(MultiPoint)` yields `Point`.
+  - `items(MultiLineString)` yields `LineString`.
+  - `items(MultiPolygon)` yields `Polygon`.
+  - `items(GeometryCollection)` yields concrete `Geometry` subtypes.
+- **`CoordSeq` iterators** — `items` yields `(float, float)`, `items3D` yields
+  `(float, float, float)`.
+- **`geometry_base` module** — new public module consolidating `geomN` and multi-geometry
+  iterators, breaking the circular-import chain that previously forced `geomN` into `factories.nim`.
+- **Test suites** — `t_coord_seq.nim`, `t_iterators.nim` with comprehensive coverage of new
+  features including nil safety, round-trip, symmetry, and independence invariants.
+  Includes `CoordSeq.clone()` correctness, independence, and 3D tests; single-element
+  `geomN` symmetry tests for `MultiPoint` and `MultiPolygon`.
+- **Edge case test suite** — new `tests/test_edge_cases/` directory with 281 tests across 5 files
+  covering previously untested boundary conditions:
+  - `t_edge_empty_geometries.nim` — property accessors, predicates, spatial operations,
+    serialization, iterators, `coordSeq`, clone, and distance on all `EMPTY` geometry types.
+  - `t_edge_special_floats.nim` — `NaN`, `Infinity`, `-Infinity`, very large/small values,
+    negative zero, and mixed degenerate coordinates in Points, LineStrings, CoordSeqs,
+    and serializers.
+  - `t_edge_coord_ring_polygon.nim` — non-closed/degenerate/self-intersecting LinearRings,
+    CoordSeq out-of-bounds access, zero-size CoordSeq, unusual dimension counts, `items3D`
+    on 2D sequences, `coordSeq()` on Polygon/MultiPoint, and Polygon handle reuse after
+    ownership transfer.
+  - `t_edge_serializers.nim` — GeoJSON empty/nested collections, invalid coordinate values,
+    extra fields, truncated WKB, hex case sensitivity, cross-format round-trips, and WKT
+    edge inputs.
+  - `t_edge_operations.nim` — negative tolerance for simplify/snap, buffer edge cases
+    (negative/huge width, extreme quadsegs), cross-context operations, mixed-type spatial
+    operations, PreparedGeometry from empty geometry, and `geomN` on simple geometries.
+- **`testEdgeCases` nimble task** — convenience shortcut for running only the edge case tests.
+
+### Changed
+
+- **Context tests consolidated** — `t_with_context.nim` merged into `t_context.nim`. The
+  `withGeosContext` suite (scoped lifecycle, nested calls, exception propagation, leak check)
+  and nil-context → `GeosInitError` guards now live alongside the core `GeosContext` tests.
+- **`geomN` relocated** — moved from `geometries/factories.nim` to `geometry_base.nim`.
+  Eliminates the circular-import workaround documented in v0.2.0.
+- **API hardening** — `nimgeos.nim` no longer re-exports `geometries/factories` (internal helper).
+  Only user-facing modules are exported. New exports: `geometry_base`, `geometries/coord_seq`.
+- **`factories.nim` narrowed** — now contains only the internal `geomFromHandle` proc. The
+  `geomN` proc and its TODO comment have been removed.
+- **`multi.nim` documented** — `wrapMultiHandle` now has an expanded doc comment explaining
+  why it intentionally duplicates the multi-type branch of `geomFromHandle`: importing
+  `factories.nim` or `geometry_base.nim` from `multi.nim` would create a circular dependency.
+- **Version bumped** to `0.9.0` in `nimgeos.nimble`.
+
+---
+
 ## [0.8.0] - 2026-04-24
 
 ### Added

@@ -31,6 +31,7 @@ proc validateCoords[T](ctx: GeosContext; coords: openArray[T]): GEOSCoordSequenc
 proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float)]): LineString =
   ## Create a 2D LineString from an array of (x, y) tuples.
   ## Requires at least 2 coordinates.
+  checkContext(ctx, "createLineString")
   let sq = validateCoords(ctx, coords)
   let handle = GEOSGeom_createLineString_r(ctx.handle, sq)
   if cast[pointer](handle) == nil:
@@ -40,6 +41,7 @@ proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float)]):
 proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float, float)]): LineString =
   ## Create a 3D LineString from an array of (x, y, z) tuples.
   ## Requires at least 2 coordinates.
+  checkContext(ctx, "createLineString")
   let sq = validateCoords(ctx, coords)
   let handle = GEOSGeom_createLineString_r(ctx.handle, sq)
   if cast[pointer](handle) == nil:

@@ -29,6 +29,7 @@ proc parseHexDigit(c: char): int =
 
 proc fromWKB*(ctx: var GeosContext; wkb: openArray[byte]): Geometry =
   ## Parse a WKB byte sequence into the corresponding concrete Geometry.
+  checkContext(ctx, "fromWKB")
   if wkb.len == 0:
     raise newException(GeosParseError, "Cannot parse empty WKB")
   let reader = GEOSWKBReader_create_r(ctx.handle)

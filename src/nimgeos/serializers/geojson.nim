@@ -317,6 +317,7 @@ proc toGeoJSON*(g: Geometry): string =
 
 proc fromGeoJSON*(ctx: var GeosContext; json: string): Geometry =
   ## Parse a GeoJSON geometry object string into a concrete Geometry.
+  checkContext(ctx, "fromGeoJSON")
   var node: JsonNode
   try:
     node = parseJson(json)

@@ -57,3 +57,29 @@ proc version*(ctx: GeosContext): string =
 proc isNil*(ctx: GeosContext): bool {.inline.} =
   ## Checks if the context handle is nil (i.e. the context has been destroyed).
   cast[pointer](ctx.handle) == nil
+
+# ── Nil-context guard ─────────────────────────────────────────────────────────
+template checkContext*(ctx: GeosContext; label: string) =
+  ## Raises ``GeosInitError`` when the context handle has been destroyed or was
+  ## never initialised.  Used as a guard in constructors and deserializers to
+  ## prevent segfaults from passing a nil handle into libgeos_c.
+  if cast[pointer](ctx.handle) == nil:
+    raise newException(GeosInitError,
+      label & " called on destroyed/nil GeosContext")
+
+# ── Scoped context lifecycle ──────────────────────────────────────────────────
+proc withGeosContext*(body: proc(ctx: var GeosContext)) =
+  ## Execute `body` with a temporary GeosContext that is automatically
+  ## destroyed when `body` returns (or raises).
+  ##
+  ## This is the recommended way to work with GEOS when you want
+  ## deterministic cleanup and protection against use-after-free:
+  ##
+  ## .. code-block:: nim
+  ##   withGeosContext proc(ctx: var GeosContext) =
+  ##     let point = ctx.createPoint(12.34, 56.78)
+  ##     echo point.toWKT()
+  ##   # ctx is destroyed here — any escaped Geometry refs are now invalid
+  var ctx = initGeosContext()
+  body(ctx)
+  # =destroy fires here, freeing the GEOS context handle

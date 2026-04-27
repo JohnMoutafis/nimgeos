@@ -44,7 +44,11 @@ proc inferCollectionGeomType(ctx: ptr GeosContext; handles: seq[GEOSGeometry]): 
 
 proc wrapMultiHandle(ctx: ptr GeosContext; handle: GEOSGeometry; geomType: GeomType): Geometry =
   ## Wrap a raw collection handle in the correct concrete multi-geometry type.
-  ## Avoids a circular import of factories.
+  ##
+  ## This helper intentionally duplicates the multi-type branch of
+  ## ``geomFromHandle`` (in ``factories.nim``) because ``multi.nim`` **cannot**
+  ## import ``factories.nim`` or ``geometry_base.nim`` without creating a
+  ## circular dependency (both of those modules import this one).
   case geomType
   of gtMultiPoint:         MultiPoint(ctx: ctx, handle: handle)
   of gtMultiLineString:    MultiLineString(ctx: ctx, handle: handle)
@@ -64,6 +68,7 @@ proc createMultiGeometry*(ctx: var GeosContext; geoms: var seq[Geometry]): Geome
   ##   mixed          → GeometryCollection
   ## Takes ownership of all geometry handles.
   ## Do NOT use geoms after this call.
+  checkContext(ctx, "createMultiGeometry")
   if geoms.len == 0:
     raise newException(GeosGeomError, "Cannot create multi-geometry from empty sequence")
 
