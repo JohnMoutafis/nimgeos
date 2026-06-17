@@ -43,3 +43,6 @@ task testEdgeCases, "Run edge case tests":
   for file in findTestFiles("tests/test_edge_cases"):
     echo "Running: " & file
     exec "nim r --hints:off " & file
+
+task docs, "Build documentation":
+  exec "nim doc --hints:off src/nimgeos.nim"

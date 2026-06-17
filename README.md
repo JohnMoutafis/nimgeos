@@ -89,6 +89,26 @@ echo p3d          # Point (1.0 2.0 3.0)
 nimble test
 ```
 
+## Supported Platforms
+
+| Platform | Status | CI |
+|----------|--------|----|
+| Ubuntu (latest) | ✅ Supported | Full CI on every PR and push |
+| macOS (latest)  | ✅ Supported | Full CI on every PR and push |
+| Windows         | 🧪 Experimental | CI runs; failures non-blocking |
+
+Nim versions: **stable** (required, CI-gated) and **devel** (CI runs but allow-failure).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full CI policy and platform support details.
+
+## Building Documentation
+
+```sh
+nimble docs
+```
+
+Output is written to `src/htmldocs/`.
+
 ## License
 
 MIT
