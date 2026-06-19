@@ -24,7 +24,7 @@ proc defaultErrorHandler(message: cstring; userdata: pointer) {.cdecl, raises: [
 # ── GeosContext type ───────────────────────────────────────────────────────────
 type
   GeosContext* = object
-    handle*: GEOSContextHandle_t
+    handle*: GEOSContextHandle_t  ## Internal — not part of stable API. Subject to change.
 
 ## Disallows copying of GeosContext
 proc `=copy`*(dst: var GeosContext; src: GeosContext) {.error:

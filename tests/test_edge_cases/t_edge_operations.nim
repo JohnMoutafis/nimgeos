@@ -271,7 +271,7 @@ suite "PreparedGeometry edge cases":
     var ctx = initGeosContext()
     let g = ctx.fromWKT("POINT EMPTY")
     try:
-      let pg = g.toPreparedGeometry()
+      let pg = g.prepare()
       # If it works, test that we can use it
       let other = ctx.fromWKT("POINT (1 1)")
       check not pg.preparedContains(other)
@@ -281,7 +281,7 @@ suite "PreparedGeometry edge cases":
 
   test "preparedContains with empty geometry as other":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(polyA).toPreparedGeometry()
+    let pg = ctx.fromWKT(polyA).prepare()
     let empty = ctx.fromWKT("POINT EMPTY")
     try:
       # Contains empty is typically false (empty is subset of everything
@@ -293,7 +293,7 @@ suite "PreparedGeometry edge cases":
 
   test "preparedIntersects with empty geometry as other":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(polyA).toPreparedGeometry()
+    let pg = ctx.fromWKT(polyA).prepare()
     let empty = ctx.fromWKT("POINT EMPTY")
     try:
       # Empty geometry intersects nothing

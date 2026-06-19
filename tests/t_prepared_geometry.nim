@@ -7,17 +7,17 @@ const innerPoly = "POLYGON ((5 5, 10 5, 10 10, 5 10, 5 5))"
 const overlapPoly = "POLYGON ((15 15, 25 15, 25 25, 15 25, 15 15))"
 const disjointPoly = "POLYGON ((30 30, 35 30, 35 35, 30 35, 30 30))"
 
-suite "toPreparedGeometry":
+suite "prepare":
   test "creates prepared geometry for valid polygon":
     var ctx = initGeosContext()
     let g = ctx.fromWKT(outerPoly)
-    let pg = g.toPreparedGeometry()
+    let pg = g.prepare()
     check pg != nil
 
   test "prepared geometry remains usable after source variable reassignment":
     var ctx = initGeosContext()
     var g = ctx.fromWKT(outerPoly)
-    let pg = g.toPreparedGeometry()
+    let pg = g.prepare()
     g = ctx.fromWKT(disjointPoly)
     let inside = ctx.fromWKT("POINT (2 2)")
     check pg.preparedContains(inside)
@@ -25,31 +25,31 @@ suite "toPreparedGeometry":
   test "nil geometry raises GeosGeomError":
     var g: Geometry
     expect GeosGeomError:
-      discard g.toPreparedGeometry()
+      discard g.prepare()
 
 suite "preparedContains":
   test "prepared contains inner polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let inner = ctx.fromWKT(innerPoly)
     check pg.preparedContains(inner)
 
   test "prepared does not contain disjoint polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let disjoint = ctx.fromWKT(disjointPoly)
     check not pg.preparedContains(disjoint)
 
   test "prepared contains interior point":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let p = ctx.fromWKT("POINT (1 1)")
     check pg.preparedContains(p)
 
   test "prepared contains matches non-prepared contains":
     var ctx = initGeosContext()
     let base = ctx.fromWKT(outerPoly)
-    let pg = base.toPreparedGeometry()
+    let pg = base.prepare()
     let probe = ctx.fromWKT(overlapPoly)
     check pg.preparedContains(probe) == base.contains(probe)
 
@@ -63,27 +63,27 @@ suite "preparedContains":
 suite "preparedIntersects":
   test "prepared intersects overlapping polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let overlap = ctx.fromWKT(overlapPoly)
     check pg.preparedIntersects(overlap)
 
   test "prepared does not intersect disjoint polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let disjoint = ctx.fromWKT(disjointPoly)
     check not pg.preparedIntersects(disjoint)
 
   test "prepared intersects matches non-prepared intersects":
     var ctx = initGeosContext()
     let base = ctx.fromWKT(outerPoly)
-    let pg = base.toPreparedGeometry()
+    let pg = base.prepare()
     let probe = ctx.fromWKT(overlapPoly)
     check pg.preparedIntersects(probe) == base.intersects(probe)
 
   test "prepared intersects performance sanity on repeated point checks":
     var ctx = initGeosContext()
     let base = ctx.fromWKT(outerPoly)
-    let pg = base.toPreparedGeometry()
+    let pg = base.prepare()
 
     var points: seq[Geometry] = @[]
     for i in 0 ..< 4000:
@@ -119,26 +119,26 @@ suite "preparedIntersects":
 suite "preparedCovers":
   test "prepared covers interior point":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let p = ctx.fromWKT("POINT (0 10)")
     check pg.preparedCovers(p)
 
   test "prepared covers inner polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let inner = ctx.fromWKT(innerPoly)
     check pg.preparedCovers(inner)
 
   test "prepared does not cover disjoint polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let disjoint = ctx.fromWKT(disjointPoly)
     check not pg.preparedCovers(disjoint)
 
   test "prepared covers agrees with non-prepared contains for inner polygon":
     var ctx = initGeosContext()
     let base = ctx.fromWKT(outerPoly)
-    let pg = base.toPreparedGeometry()
+    let pg = base.prepare()
     let inner = ctx.fromWKT(innerPoly)
     check pg.preparedCovers(inner) == base.contains(inner)
 
@@ -152,25 +152,25 @@ suite "preparedCovers":
 suite "preparedCoveredBy":
   test "inner polygon prepared is covered by outer polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(innerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(innerPoly).prepare()
     let outer = ctx.fromWKT(outerPoly)
     check pg.preparedCoveredBy(outer)
 
   test "outer polygon prepared is not covered by inner polygon":
     var ctx = initGeosContext()
-    let pg = ctx.fromWKT(outerPoly).toPreparedGeometry()
+    let pg = ctx.fromWKT(outerPoly).prepare()
     let inner = ctx.fromWKT(innerPoly)
     check not pg.preparedCoveredBy(inner)
 
   test "preparedCoveredBy matches reverse preparedCovers relation":
     var ctx = initGeosContext()
-    let a = ctx.fromWKT(innerPoly).toPreparedGeometry()
+    let a = ctx.fromWKT(innerPoly).prepare()
     let b = ctx.fromWKT(outerPoly)
-    check a.preparedCoveredBy(b) == b.toPreparedGeometry().preparedCovers(ctx.fromWKT(innerPoly))
+    check a.preparedCoveredBy(b) == b.prepare().preparedCovers(ctx.fromWKT(innerPoly))
 
   test "preparedCoveredBy handles edge-overlap case":
     var ctx = initGeosContext()
-    let edgeLine = ctx.fromWKT("LINESTRING (0 5, 20 5)").toPreparedGeometry()
+    let edgeLine = ctx.fromWKT("LINESTRING (0 5, 20 5)").prepare()
     let outer = ctx.fromWKT(outerPoly)
     check edgeLine.preparedCoveredBy(outer)
 

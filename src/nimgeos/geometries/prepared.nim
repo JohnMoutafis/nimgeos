@@ -38,25 +38,29 @@ proc evalPreparedPredicate(pg: PreparedGeometry; other: Geometry; label: string;
     raise newException(GeosGeomError, label & " failed (GEOS returned exception)")
   return rc == 1
 
-proc toPreparedGeometry*(g: Geometry): PreparedGeometry =
+proc prepare*(g: Geometry): PreparedGeometry =
   ## Builds an immutable prepared geometry from `g`.
   ##
   ## The implementation clones `g` and stores it internally so the GEOS prepared
   ## handle never outlives its source geometry.
-  g.checkHandle("toPreparedGeometry")
+  g.checkHandle("prepare")
   let sourceClone = g.clone()
   if sourceClone == nil or cast[pointer](sourceClone.handle) == nil:
-    raise newException(GeosGeomError, "toPreparedGeometry failed to clone source geometry")
+    raise newException(GeosGeomError, "prepare failed to clone source geometry")
 
   let prepHandle = GEOSPreparedGeom_create_r(sourceClone.ctx.handle, sourceClone.handle)
   if cast[pointer](prepHandle) == nil:
-    raise newException(GeosGeomError, "toPreparedGeometry failed (GEOS returned nil)")
+    raise newException(GeosGeomError, "prepare failed (GEOS returned nil)")
 
   return PreparedGeometry(
     ctx: sourceClone.ctx,
     source: sourceClone,
     handle: prepHandle
   )
+
+proc toPreparedGeometry*(g: Geometry): PreparedGeometry {.deprecated: "Use prepare instead".} =
+  ## Old name — kept for compatibility until 2.0.0.
+  g.prepare()
 
 proc preparedContains*(pg: PreparedGeometry; other: Geometry): bool =
   ## Returns true when `pg` contains `other`.
@@ -77,19 +81,19 @@ proc preparedCoveredBy*(pg: PreparedGeometry; other: Geometry): bool =
 proc preparedContains*(g: Geometry; other: Geometry): bool =
   ## Guard overload to provide a clear runtime error when callers pass Geometry
   ## instead of PreparedGeometry.
-  raise newException(GeosGeomError, "preparedContains requires PreparedGeometry; call toPreparedGeometry first")
+  raise newException(GeosGeomError, "preparedContains requires PreparedGeometry; call prepare first")
 
 proc preparedIntersects*(g: Geometry; other: Geometry): bool =
   ## Guard overload to provide a clear runtime error when callers pass Geometry
   ## instead of PreparedGeometry.
-  raise newException(GeosGeomError, "preparedIntersects requires PreparedGeometry; call toPreparedGeometry first")
+  raise newException(GeosGeomError, "preparedIntersects requires PreparedGeometry; call prepare first")
 
 proc preparedCovers*(g: Geometry; other: Geometry): bool =
   ## Guard overload to provide a clear runtime error when callers pass Geometry
   ## instead of PreparedGeometry.
-  raise newException(GeosGeomError, "preparedCovers requires PreparedGeometry; call toPreparedGeometry first")
+  raise newException(GeosGeomError, "preparedCovers requires PreparedGeometry; call prepare first")
 
 proc preparedCoveredBy*(g: Geometry; other: Geometry): bool =
   ## Guard overload to provide a clear runtime error when callers pass Geometry
   ## instead of PreparedGeometry.
-  raise newException(GeosGeomError, "preparedCoveredBy requires PreparedGeometry; call toPreparedGeometry first")
+  raise newException(GeosGeomError, "preparedCoveredBy requires PreparedGeometry; call prepare first")

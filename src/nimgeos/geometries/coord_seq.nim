@@ -17,9 +17,9 @@ import ../geometry
 type
   CoordSeq* = object
     ## Wraps a GEOSCoordSequence handle with ownership tracking.
-    ctx*: ptr GeosContext
-    handle*: GEOSCoordSequence
-    owned: bool  ## true when we own the handle and must destroy it
+    ctx*: ptr GeosContext        ## Internal — not part of stable API. Subject to change.
+    handle*: GEOSCoordSequence   ## Internal — not part of stable API. Subject to change.
+    owned: bool                  ## Internal — not part of stable API. Subject to change.
 
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
 

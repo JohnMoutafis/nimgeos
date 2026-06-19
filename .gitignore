@@ -16,3 +16,7 @@ htmldocs/
 .DS_Store
 Thumbs.db
 
+# Dev artifacts
+.idea/
+.omp-reports/
+.serena/

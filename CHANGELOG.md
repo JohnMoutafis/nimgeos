@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0] - 2026-06-19
+
+### Changed
+
+- **API frozen for 1.0.0** — public API surface is now stable.
+- **`boundaryOp` renamed to `boundary`** — old name kept as deprecated alias.
+- **`toPreparedGeometry` renamed to `prepare`** — old name kept as deprecated alias.
+- **Internal markers added** — raw fields `ctx*`, `handle*` on `GeometryObj`, `GeosContext`,
+  and `CoordSeq` are documented as internal/unstable.
+- **Version bumped to `1.0.0`** — public API is now stable.
+
+### Deprecated
+
+- `boundaryOp` — use `boundary` instead.
+- `toPreparedGeometry` — use `prepare` instead.
+
 ## [0.9.0] - 2025-07-18
 
 ### Added

@@ -21,10 +21,10 @@ type
 type
   GeometryObj* = object of RootObj
     ## Internal base — never instantiate directly. Use concrete subtypes.
-    ctx*:    ptr GeosContext
-    handle*: GEOSGeometry
-
+    ctx*:    ptr GeosContext    ## Internal — not part of stable API. Subject to change.
+    handle*: GEOSGeometry      ## Internal — not part of stable API. Subject to change.
   Geometry* = ref GeometryObj
+
 
 # ── Lifecycle hooks ────────────────────────────────────────────────────────────
 proc `=destroy`*(g: GeometryObj) =
@@ -58,11 +58,13 @@ proc clone*(g: Geometry): Geometry =
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
 proc checkHandle*(g: Geometry; label: string) {.inline.} =
+  ## Internal — not part of stable API. Subject to change without notice.
   if g == nil or cast[pointer](g.handle) == nil:
     raise newException(GeosGeomError, label & " called on nil Geometry")
 
 proc wrapHandle*(ctx: ptr GeosContext; handle: GEOSGeometry): Geometry =
-  ## Internal factory: wraps a raw handle in the base Geometry type.
+  ## Internal — not part of stable API. Subject to change without notice.
+  ## Wraps a raw handle in the base Geometry type.
   ## Used by spatial operation results before kind-dispatch is needed.
   if cast[pointer](handle) == nil:
     raise newException(GeosGeomError, "wrapHandle received nil from GEOS")

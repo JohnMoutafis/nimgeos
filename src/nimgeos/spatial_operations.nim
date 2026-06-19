@@ -118,7 +118,11 @@ proc unaryUnion*(g: Geometry): Geometry =
   ## For non-collections, GEOS returns an equivalent normalized geometry.
   evalUnaryOp(g, "unaryUnion", GEOSUnaryUnion_r)
 
-proc boundaryOp*(g: Geometry): Geometry =
+proc boundary*(g: Geometry): Geometry =
   ## Returns the topological boundary of a geometry.
   ## For points, boundary is empty; for polygons, boundary is ring(s).
-  evalUnaryOp(g, "boundaryOp", GEOSBoundary_r)
+  evalUnaryOp(g, "boundary", GEOSBoundary_r)
+
+proc boundaryOp*(g: Geometry): Geometry {.deprecated: "Use boundary instead".} =
+  ## Old name — kept for compatibility until 2.0.0.
+  g.boundary()
