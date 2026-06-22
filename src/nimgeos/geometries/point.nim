@@ -7,9 +7,12 @@ import ../errors
 import ../geometry
 
 type
+  ## A 2D or 3D Point geometry. Holds a single coordinate with optional Z.
   PointObj* = object of GeometryObj
-  Point*    = ref PointObj
+  ## Reference type for a Point geometry.
+  Point* = ref PointObj
 
+## Create a 2D Point from `x` and `y` coordinates.
 proc createPoint*(ctx: var GeosContext; x, y: float): Point =
   checkContext(ctx, "createPoint")
   let handle = GEOSGeom_createPointFromXY_r(ctx.handle, x.cdouble, y.cdouble)
@@ -17,6 +20,7 @@ proc createPoint*(ctx: var GeosContext; x, y: float): Point =
     raise newException(GeosGeomError, "Failed to create Point")
   return Point(ctx: addr ctx, handle: handle)
 
+## Create a 3D Point from `x`, `y`, and `z` coordinates.
 proc createPoint*(ctx: var GeosContext; x, y, z: float): Point =
   checkContext(ctx, "createPoint")
   let sq = GEOSCoordSeq_create_r(ctx.handle, 1.cuint, 3.cuint)
@@ -31,6 +35,7 @@ proc createPoint*(ctx: var GeosContext; x, y, z: float): Point =
     raise newException(GeosGeomError, "Failed to create 3D Point")
   return Point(ctx: addr ctx, handle: handle)
 
+## Returns the X coordinate of the Point.
 proc x*(p: Point): float =
   p.checkHandle("x")
   var v: cdouble
@@ -38,6 +43,7 @@ proc x*(p: Point): float =
     raise newException(GeosGeomError, "GEOSGeomGetX_r failed")
   return v.float
 
+## Returns the Y coordinate of the Point.
 proc y*(p: Point): float =
   p.checkHandle("y")
   var v: cdouble

@@ -9,16 +9,24 @@ import ../geometry
 
 # ── Type declarations ─────────────────────────────────────────────────────────
 type
+  ## A collection of Point geometries.
   MultiPointObj*           = object of GeometryObj
+  ## Reference type for a MultiPoint collection.
   MultiPoint*              = ref MultiPointObj
 
+  ## A collection of LineString geometries.
   MultiLineStringObj*      = object of GeometryObj
+  ## Reference type for a MultiLineString collection.
   MultiLineString*         = ref MultiLineStringObj
 
+  ## A collection of Polygon geometries.
   MultiPolygonObj*         = object of GeometryObj
+  ## Reference type for a MultiPolygon collection.
   MultiPolygon*            = ref MultiPolygonObj
 
+  ## A mixed collection of any geometry types.
   GeometryCollectionObj*   = object of GeometryObj
+  ## Reference type for a GeometryCollection.
   GeometryCollection*      = ref GeometryCollectionObj
 
 # --- Internal helpers ----------------------------------------------------------
@@ -92,18 +100,22 @@ proc createMultiGeometry*(ctx: var GeosContext; geoms: var seq[Geometry]): Geome
 
 # ── String representations ────────────────────────────────────────────────────
 
+## String representation — "MultiPoint(N points)" where N is the point count.
 method `$`*(g: MultiPoint): string =
   if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiPoint>"
   return "MultiPoint(" & $g.numGeometries() & " points)"
 
+## String representation — "MultiLineString(N linestrings)" where N is the line count.
 method `$`*(g: MultiLineString): string =
   if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiLineString>"
   return "MultiLineString(" & $g.numGeometries() & " linestrings)"
 
+## String representation — "MultiPolygon(N polygons)" where N is the polygon count.
 method `$`*(g: MultiPolygon): string =
   if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiPolygon>"
   return "MultiPolygon(" & $g.numGeometries() & " polygons)"
 
+## String representation — "GeometryCollection(N geometries)" where N is the component count.
 method `$`*(g: GeometryCollection): string =
   if g == nil or cast[pointer](g.handle) == nil: return "<nil GeometryCollection>"
   return "GeometryCollection(" & $g.numGeometries() & " geometries)"

@@ -7,9 +7,10 @@ import ../geometry
 import ./point
 
 type
+  ## A LineString geometry — a path defined by a sequence of points.
   LineStringObj* = object of GeometryObj
-  LineString*    = ref LineStringObj
-
+  ## Reference type for a LineString geometry.
+  LineString* = ref LineStringObj
 proc validateCoords[T](ctx: GeosContext; coords: openArray[T]): GEOSCoordSequence =
   ## Shared validation and CoordSequence construction for LineString.
   ## GEOS requires at least 2 points.
@@ -81,6 +82,7 @@ proc endPoint*(ls: LineString): Point =
     raise newException(GeosGeomError, "GEOSGeomGetEndPoint_r failed")
   return Point(ctx: ls.ctx, handle: handle)
 
+## String representation — returns "LineString(N points)" where N is the point count.
 method `$`*(ls: LineString): string =
   if ls == nil or cast[pointer](ls.handle) == nil: return "<nil LineString>"
   return "LineString(" & $ls.numPoints() & " points)"

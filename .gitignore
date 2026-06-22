@@ -11,6 +11,7 @@ nimblecache/
 nimble.lock  # add only once deps are stable
 
 htmldocs/
+site/
 
 # OS
 .DS_Store

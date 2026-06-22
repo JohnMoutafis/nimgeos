@@ -9,8 +9,10 @@ import ../errors
 import ../geometry
 
 type
+  ## A LinearRing geometry — a closed ring used for Polygon boundaries.
   LinearRingObj* = object of GeometryObj
-  LinearRing*    = ref LinearRingObj
+  ## Reference type for a LinearRing geometry.
+  LinearRing* = ref LinearRingObj
 
 proc validateRingCoords[T](ctx: GeosContext; coords: openArray[T]): GEOSCoordSequence =
   ## Shared validation and CoordSequence construction for LinearRing.
@@ -54,6 +56,7 @@ proc createLinearRing*(ctx: var GeosContext; coords: openArray[(float, float, fl
     raise newException(GeosGeomError, "Failed to create 3D LinearRing — check coords form a closed ring")
   return LinearRing(ctx: addr ctx, handle: handle)
 
+## String representation — returns "LinearRing(N coords)" where N is the coordinate count.
 method `$`*(lr: LinearRing): string =
   if lr == nil or cast[pointer](lr.handle) == nil: return "<nil LinearRing>"
   return "LinearRing(" & $lr.numCoordinates() & " coords)"

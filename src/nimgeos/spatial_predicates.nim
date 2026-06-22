@@ -19,28 +19,46 @@ proc evalPredicate(g, other: Geometry; label: string;
     raise newException(GeosGeomError, label & " failed (GEOS returned exception)")
   return rc == 1
 
-# ── Public API ───────────────────────────────────────────────────────────────
-
+  
+## Returns `true` if `g` is spatially equal to `other` (same point set).
+## Based on the DE-9IM model. Raises `GeosGeomError` on GEOS exception.
 proc equals*(g, other: Geometry): bool =
-  evalPredicate(g, other, "equals", GEOSEquals_r)
-
+  return evalPredicate(g, other, "equals", GEOSEquals_r)
+  
+## Returns `true` if `g` and `other` share any point in space.
+## Based on the DE-9IM model. Raises `GeosGeomError` on GEOS exception.
 proc intersects*(g, other: Geometry): bool =
-  evalPredicate(g, other, "intersects", GEOSIntersects_r)
-
+  return evalPredicate(g, other, "intersects", GEOSIntersects_r)
+  
+## Returns `true` if `other` lies entirely within `g`.
+## Based on the DE-9IM model. Raises `GeosGeomError` on GEOS exception.
 proc contains*(g, other: Geometry): bool =
-  evalPredicate(g, other, "contains", GEOSContains_r)
-
+  return evalPredicate(g, other, "contains", GEOSContains_r)
+  
+## Returns `true` if `g` and `other` touch at their boundaries but do not
+## intersect in their interiors. Based on the DE-9IM model.
+## Raises `GeosGeomError` on GEOS exception.
 proc touches*(g, other: Geometry): bool =
-  evalPredicate(g, other, "touches", GEOSTouches_r)
-
+  return evalPredicate(g, other, "touches", GEOSTouches_r)
+  
+## Returns `true` if `g` lies entirely within `other` (the inverse of `contains`).
+## Based on the DE-9IM model. Raises `GeosGeomError` on GEOS exception.
 proc within*(g, other: Geometry): bool =
-  evalPredicate(g, other, "within", GEOSWithin_r)
-
+  return evalPredicate(g, other, "within", GEOSWithin_r)
+  
+## Returns `true` if `g` and `other` share no points in common.
+## Based on the DE-9IM model. Raises `GeosGeomError` on GEOS exception.
 proc disjoint*(g, other: Geometry): bool =
-  evalPredicate(g, other, "disjoint", GEOSDisjoint_r)
-
+  return evalPredicate(g, other, "disjoint", GEOSDisjoint_r)
+  
+## Returns `true` if `g` and `other` intersect at interior points but not all
+## of one is contained in the other. Based on the DE-9IM model.
+## Raises `GeosGeomError` on GEOS exception.
 proc crosses*(g, other: Geometry): bool =
-  evalPredicate(g, other, "crosses", GEOSCrosses_r)
-
+  return evalPredicate(g, other, "crosses", GEOSCrosses_r)
+  
+## Returns `true` if `g` and `other` share interior points but neither
+## contains the other. Based on the DE-9IM model.
+## Raises `GeosGeomError` on GEOS exception.
 proc overlaps*(g, other: Geometry): bool =
-  evalPredicate(g, other, "overlaps", GEOSOverlaps_r)
+  return evalPredicate(g, other, "overlaps", GEOSOverlaps_r)

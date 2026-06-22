@@ -1,0 +1,78 @@
+site_name: nimgeos
+site_description: Nim wrapper for the GEOS geometry engine (libgeos_c)
+site_url: https://johnmoutafis.github.io/nimgeos/
+repo_url: https://github.com/JohnMoutafis/nimgeos
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to system preference
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.sections
+    - content.code.copy
+  font:
+    text: Roboto
+    code: Fira Code
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Context Lifecycle: getting-started/context-lifecycle.md
+  - Geometry Types:
+    - Overview: geometries/overview.md
+    - Point: geometries/point.md
+    - LineString: geometries/linestring.md
+    - LinearRing: geometries/linearring.md
+    - Polygon: geometries/polygon.md
+    - Multi-geometries: geometries/multi.md
+    - Prepared Geometry: geometries/prepared.md
+    - CoordSeq: geometries/coord-seq.md
+  - Serialization:
+    - WKT: serialization/wkt.md
+    - WKB: serialization/wkb.md
+    - GeoJSON: serialization/geojson.md
+  - Operations:
+    - Predicates: operations/predicates.md
+    - Spatial Operations: operations/spatial-operations.md
+  - Edge Cases: edge-cases.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/JohnMoutafis/nimgeos

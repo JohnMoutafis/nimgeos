@@ -7,8 +7,10 @@ import ../geometry
 import ./linearring
 
 type
+  ## A Polygon geometry — an area defined by an exterior ring and optional holes.
   PolygonObj* = object of GeometryObj
-  Polygon*    = ref PolygonObj
+  ## Reference type for a Polygon geometry.
+  Polygon* = ref PolygonObj
 
 proc createPolygon*(ctx: var GeosContext; shell: LinearRing; holes: openArray[LinearRing] = []): Polygon =
   ## Create a Polygon from a shell LinearRing and optional hole LinearRings.
