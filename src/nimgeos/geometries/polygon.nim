@@ -71,5 +71,4 @@ proc interiorRingN*(p: Polygon; n: int): LinearRing =
 
 method `$`*(p: Polygon): string =
   ## String representation showing the number of interior rings (holes).
-  if p == nil or cast[pointer](p.handle) == nil: return "<nil Polygon>"
   return "Polygon(" & $p.numInteriorRings() & " holes)"

@@ -82,5 +82,4 @@ proc endPoint*(ls: LineString): Point =
   return Point(ctx: ls.ctx, handle: handle)
 
 method `$`*(ls: LineString): string =
-  if ls == nil or cast[pointer](ls.handle) == nil: return "<nil LineString>"
   return "LineString(" & $ls.numPoints() & " points)"

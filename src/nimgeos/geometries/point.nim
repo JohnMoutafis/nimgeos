@@ -53,8 +53,7 @@ proc z*(p: Point): float =
   return v.float
 
 method `$`*(p: Point): string =
-  if p == nil or cast[pointer](p.handle) == nil: return "<nil Point>"
-  elif p.z().isNaN():
+  if p.z().isNaN():
     return "Point (" & $p.x() & " " & $p.y() & ")"
   else:
     return "Point (" & $p.x() & " " & $p.y() & " " & $p.z() & ")"

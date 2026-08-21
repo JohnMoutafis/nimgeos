@@ -93,17 +93,13 @@ proc createMultiGeometry*(ctx: var GeosContext; geoms: var seq[Geometry]): Geome
 # ── String representations ────────────────────────────────────────────────────
 
 method `$`*(g: MultiPoint): string =
-  if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiPoint>"
   return "MultiPoint(" & $g.numGeometries() & " points)"
 
 method `$`*(g: MultiLineString): string =
-  if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiLineString>"
   return "MultiLineString(" & $g.numGeometries() & " linestrings)"
 
 method `$`*(g: MultiPolygon): string =
-  if g == nil or cast[pointer](g.handle) == nil: return "<nil MultiPolygon>"
   return "MultiPolygon(" & $g.numGeometries() & " polygons)"
 
 method `$`*(g: GeometryCollection): string =
-  if g == nil or cast[pointer](g.handle) == nil: return "<nil GeometryCollection>"
   return "GeometryCollection(" & $g.numGeometries() & " geometries)"

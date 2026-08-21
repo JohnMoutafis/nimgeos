@@ -55,5 +55,4 @@ proc createLinearRing*(ctx: var GeosContext; coords: openArray[(float, float, fl
   return LinearRing(ctx: addr ctx, handle: handle)
 
 method `$`*(lr: LinearRing): string =
-  if lr == nil or cast[pointer](lr.handle) == nil: return "<nil LinearRing>"
   return "LinearRing(" & $lr.numCoordinates() & " coords)"
