@@ -1,5 +1,6 @@
 ## GEOS context lifecycle wrapper.
 ## One GeosContext per thread. Non-copyable, deterministically destroyed by ORC.
+## See also: `docs/getting-started/context-lifecycle.md`.
 
 import ./private/geos_abi
 import ./errors
@@ -40,7 +41,10 @@ proc initGeosContext*(
   noticeHandler: GEOSMessageHandler_r = defaultNoticeHandler,
   errorHandler:  GEOSMessageHandler_r = defaultErrorHandler
 ): GeosContext =
-  ## Initialise a GEOS context. Raises GeosInitError if GEOS fails to start.
+  ## Initialise a GEOS context.
+  ## `noticeHandler`/`errorHandler` override the GEOS message callbacks
+  ## (defaults write to stderr).
+  ## Raises `GeosInitError` if GEOS fails to start.
   let handle = GEOS_init_r()
   if cast[pointer](handle) == nil:
     raise newException(GeosInitError, "GEOS_init_r() returned nil — is libgeos_c installed?")
@@ -80,6 +84,8 @@ proc withGeosContext*(body: proc(ctx: var GeosContext)) =
   ##     let point = ctx.createPoint(12.34, 56.78)
   ##     echo point.toWKT()
   ##   # ctx is destroyed here — any escaped Geometry refs are now invalid
+  ##
+  ## Raises whatever `body` raises.
   var ctx = initGeosContext()
   body(ctx)
   # =destroy fires here, freeing the GEOS context handle

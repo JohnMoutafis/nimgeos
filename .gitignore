@@ -12,6 +12,7 @@ nimble.lock  # add only once deps are stable
 
 htmldocs/
 site/
+docs/api/
 
 # OS
 .DS_Store

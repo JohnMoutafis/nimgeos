@@ -1,10 +1,11 @@
 ## Error types for GEOS operations.
+## See also: `docs/edge-cases.md`.
 type
-  ## Base error type for GEOS operations.
   GeosError* = object of CatchableError
-  ## Raised when GEOS context initialisation fails.
+    ## Base error type for GEOS operations.
   GeosInitError* = object of GeosError
-  ## Raised when a GEOS geometry operation or calculation fails.
+    ## Raised when GEOS context initialisation fails.
   GeosGeomError* = object of GeosError
-  ## Raised when parsing WKT, WKB, or GeoJSON input fails.
+    ## Raised when a GEOS geometry operation or calculation fails.
   GeosParseError* = object of GeosError
+    ## Raised when parsing WKT, WKB, or GeoJSON input fails.

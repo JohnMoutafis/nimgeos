@@ -2,6 +2,7 @@
 ##
 ## Public API re-exports. Internal modules (``private/``, ``factories``) are
 ## intentionally **not** re-exported.
+## See also: the user guide at `docs/index.md`.
 
 # ── Core ──────────────────────────────────────────────────────────────────────
 import nimgeos/errors

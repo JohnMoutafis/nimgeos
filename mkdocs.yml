@@ -71,6 +71,7 @@ nav:
     - Predicates: operations/predicates.md
     - Spatial Operations: operations/spatial-operations.md
   - Edge Cases: edge-cases.md
+  - API Reference: api/nimgeos.html
 
 extra:
   social:

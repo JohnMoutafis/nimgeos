@@ -1,6 +1,7 @@
 ## GeoJSON serializer for Nimgeos.
 ## Handles GeoJSON geometry objects.
 ## - Features and FeatureCollections are out of scope of this module.
+## See also: `docs/serialization/geojson.md`.
 
 import std/json
 import std/math
@@ -310,13 +311,28 @@ proc parseGeomFromNode(ctx: GEOSContextHandle_t; node: JsonNode): GEOSGeometry =
 # ── Public API ────────────────────────────────────────────────────────────────
 
 proc toGeoJSON*(g: Geometry): string =
-  ## Serialize any Geometry to a GeoJSON geometry object string.
+  ## Serialize `g` to a GeoJSON geometry object string.
+  ##
+  ## .. code-block:: nim
+  ##   var ctx = initGeosContext()
+  ##   echo ctx.createPoint(1.0, 2.0).toGeoJSON()
+  ##   # {"type":"Point","coordinates":[1.0,2.0]}
+  ##
+  ## Raises `GeosGeomError` if `g` is nil or serialization fails.
   checkHandle(g, "toGeoJSON")
   let node = geomToJsonNode(g.ctx.handle, g.handle)
   return $node
 
 proc fromGeoJSON*(ctx: var GeosContext; json: string): Geometry =
-  ## Parse a GeoJSON geometry object string into a concrete Geometry.
+  ## Parse the GeoJSON geometry object string `json` into a concrete Geometry.
+  ##
+  ## .. code-block:: nim
+  ##   var ctx = initGeosContext()
+  ##   let g = ctx.fromGeoJSON("{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}")
+  ##   echo g.type()   # gtPoint
+  ##
+  ## Raises `GeosInitError` if `ctx` is destroyed; `GeosParseError` if the
+  ## input is not valid GeoJSON.
   checkContext(ctx, "fromGeoJSON")
   var node: JsonNode
   try:

@@ -150,11 +150,14 @@ This guard covers:
 - Spatial operations (`buffer`, `difference`, `intersection`, etc.)
 - Serialization (`toWKT`, `toWKB`, `toGeoJSON`)
 
-**String representations** (`$`) gracefully return `"<nil ...>"` instead of raising:
+**String representations** (`$`) raise `NilAccessDefect` on a nil geometry:
 
 ```nim
 let nilPt: Point = nil
-echo nilPt  # "<nil Point>"
+try:
+  echo nilPt
+except NilAccessDefect:
+  echo "nil Point"  # handled
 ```
 
 ---

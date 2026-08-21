@@ -6,6 +6,7 @@
 ## Ownership: a CoordSeq created via `newCoordSeq` owns its handle and will
 ## destroy it when the object goes out of scope. A CoordSeq obtained from a
 ## geometry via `coordSeq()` is cloned, so the caller owns the result.
+## See also: `docs/geometries/coord-seq.md`.
 
 import ../private/geos_abi
 import ../context
@@ -24,6 +25,8 @@ type
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 proc `=destroy`*(cs: CoordSeq) =
+  ## Destroys the owned GEOSCoordSequence handle when `cs` goes out of scope.
+  ## No-op for non-owned (borrowed) sequences.
   if cs.owned and cast[pointer](cs.handle) != nil and cs.ctx != nil:
     GEOSCoordSeq_destroy_r(cs.ctx.handle, cs.handle)
 
@@ -63,6 +66,9 @@ proc newCoordSeq*(ctx: var GeosContext; size: int; dims: int = 2): CoordSeq =
   ## .. code-block:: nim
   ##   var cs = newCoordSeq(ctx, 3, 2)
   ##   cs.setCoord(0, 1.0, 2.0)
+  ##
+  ## Raises `GeosInitError` if `ctx` is destroyed; `GeosGeomError` if GEOS
+  ## fails to allocate the sequence.
   checkContext(ctx, "newCoordSeq")
   let handle = GEOSCoordSeq_create_r(ctx.handle, size.cuint, dims.cuint)
   if cast[pointer](handle) == nil:
@@ -80,6 +86,8 @@ proc coordSeq*(g: Geometry): CoordSeq =
   ##   let cs = myLineString.coordSeq()
   ##   for coord in cs:
   ##     echo coord
+  ##
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("coordSeq")
   let borrowed = GEOSGeom_getCoordSeq_r(g.ctx.handle, g.handle)
   if cast[pointer](borrowed) == nil:
@@ -103,6 +111,7 @@ proc coordSeq*(g: Geometry): CoordSeq =
 
 proc len*(cs: CoordSeq): int =
   ## Return the number of coordinates in the sequence.
+  ## Raises `GeosGeomError` if the sequence is nil or GEOS fails.
   cs.checkHandle("len")
   var size: cuint
   if GEOSCoordSeq_getSize_r(cs.ctx.handle, cs.handle, addr size) == 0:
@@ -111,6 +120,7 @@ proc len*(cs: CoordSeq): int =
 
 proc dims*(cs: CoordSeq): int =
   ## Return the number of dimensions (2 or 3).
+  ## Raises `GeosGeomError` if the sequence is nil or GEOS fails.
   cs.checkHandle("dims")
   var d: cuint
   if GEOSCoordSeq_getDimensions_r(cs.ctx.handle, cs.handle, addr d) == 0:
@@ -121,18 +131,21 @@ proc dims*(cs: CoordSeq): int =
 
 proc setX*(cs: CoordSeq; idx: int; val: float) =
   ## Set the X value at index `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("setX")
   if GEOSCoordSeq_setX_r(cs.ctx.handle, cs.handle, idx.cuint, val.cdouble) == 0:
     raise newException(GeosGeomError, "GEOSCoordSeq_setX_r failed at index " & $idx)
 
 proc setY*(cs: CoordSeq; idx: int; val: float) =
   ## Set the Y value at index `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("setY")
   if GEOSCoordSeq_setY_r(cs.ctx.handle, cs.handle, idx.cuint, val.cdouble) == 0:
     raise newException(GeosGeomError, "GEOSCoordSeq_setY_r failed at index " & $idx)
 
 proc setZ*(cs: CoordSeq; idx: int; val: float) =
   ## Set the Z value at index `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("setZ")
   if GEOSCoordSeq_setZ_r(cs.ctx.handle, cs.handle, idx.cuint, val.cdouble) == 0:
     raise newException(GeosGeomError, "GEOSCoordSeq_setZ_r failed at index " & $idx)
@@ -141,6 +154,7 @@ proc setZ*(cs: CoordSeq; idx: int; val: float) =
 
 proc getX*(cs: CoordSeq; idx: int): float =
   ## Get the X value at index `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("getX")
   var v: cdouble
   if GEOSCoordSeq_getX_r(cs.ctx.handle, cs.handle, idx.cuint, addr v) == 0:
@@ -149,6 +163,7 @@ proc getX*(cs: CoordSeq; idx: int): float =
 
 proc getY*(cs: CoordSeq; idx: int): float =
   ## Get the Y value at index `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("getY")
   var v: cdouble
   if GEOSCoordSeq_getY_r(cs.ctx.handle, cs.handle, idx.cuint, addr v) == 0:
@@ -157,6 +172,7 @@ proc getY*(cs: CoordSeq; idx: int): float =
 
 proc getZ*(cs: CoordSeq; idx: int): float =
   ## Get the Z value at index `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("getZ")
   var v: cdouble
   if GEOSCoordSeq_getZ_r(cs.ctx.handle, cs.handle, idx.cuint, addr v) == 0:
@@ -167,11 +183,13 @@ proc getZ*(cs: CoordSeq; idx: int): float =
 
 proc setCoord*(cs: CoordSeq; idx: int; x, y: float) =
   ## Set both X and Y for coordinate at `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.setX(idx, x)
   cs.setY(idx, y)
 
 proc setCoord*(cs: CoordSeq; idx: int; x, y, z: float) =
   ## Set X, Y, and Z for coordinate at `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.setX(idx, x)
   cs.setY(idx, y)
   cs.setZ(idx, z)
@@ -183,6 +201,8 @@ proc clone*(cs: CoordSeq): CoordSeq =
   ##
   ## .. code-block:: nim
   ##   var copy = original.clone()
+  ##
+  ## Raises `GeosGeomError` if the sequence is nil or GEOS fails.
   cs.checkHandle("clone")
   let n = cs.len
   let d = cs.dims
@@ -196,10 +216,12 @@ proc clone*(cs: CoordSeq): CoordSeq =
 
 proc getCoord*(cs: CoordSeq; idx: int): (float, float) =
   ## Get `(x, y)` for coordinate at `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   (cs.getX(idx), cs.getY(idx))
 
 proc getCoord3D*(cs: CoordSeq; idx: int): (float, float, float) =
   ## Get `(x, y, z)` for coordinate at `idx`.
+  ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   (cs.getX(idx), cs.getY(idx), cs.getZ(idx))
 
 # ── Iterators ─────────────────────────────────────────────────────────────────
@@ -210,6 +232,8 @@ iterator items*(cs: CoordSeq): (float, float) =
   ## .. code-block:: nim
   ##   for (x, y) in cs:
   ##     echo x, ", ", y
+  ##
+  ## Raises `GeosGeomError` if the sequence is nil or GEOS fails.
   cs.checkHandle("items(CoordSeq)")
   let n = cs.len
   for i in 0 ..< n:
@@ -224,6 +248,8 @@ iterator items3D*(cs: CoordSeq): (float, float, float) =
   ## .. code-block:: nim
   ##   for (x, y, z) in cs:
   ##     echo x, ", ", y, ", ", z
+  ##
+  ## Raises `GeosGeomError` if the sequence is nil or GEOS fails.
   cs.checkHandle("items3D(CoordSeq)")
   let n = cs.len
   for i in 0 ..< n:

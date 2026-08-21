@@ -28,6 +28,14 @@ jobs:
           python-version: "3.x"
       - name: Install mkdocs-material
         run: pip install mkdocs-material
+      - name: Setup Nim
+        uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: stable
+      - name: Install libgeos
+        run: sudo apt-get update && sudo apt-get install -y libgeos-dev
+      - name: Generate API reference
+        run: nim doc --project --index:on --outdir:docs/api src/nimgeos.nim
       - name: Build documentation
         run: mkdocs build --strict
       - name: Setup Pages

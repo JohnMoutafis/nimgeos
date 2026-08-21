@@ -4,6 +4,7 @@
 ##
 ## This module breaks the circular-import chain that previously forced `geomN`
 ## to live in `factories.nim`.
+## See also: `docs/geometries/multi.md`.
 
 import ./private/geos_abi
 import ./context
@@ -26,6 +27,8 @@ proc geomN*(g: Geometry; n: int): Geometry =
   ##   let mp = ctx.fromWKT("MULTIPOINT ((0 0), (1 1), (2 2))")
   ##   let sub = mp.geomN(1)   # → Point (1 1)
   ##   echo sub.toWKT()
+  ##
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("geomN")
   let count = g.numGeometries()
   if n < 0 or n >= count:
@@ -69,6 +72,8 @@ iterator items*(g: MultiPoint): Point =
   ## .. code-block:: nim
   ##   for pt in multiPoint:
   ##     echo pt.x(), " ", pt.y()
+  ##
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("items(MultiPoint)")
   let n = g.numGeometries()
   for i in 0 ..< n:
@@ -81,6 +86,8 @@ iterator items*(g: MultiLineString): LineString =
   ## .. code-block:: nim
   ##   for ls in multiLineString:
   ##     echo ls.numPoints(), " points"
+  ##
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("items(MultiLineString)")
   let n = g.numGeometries()
   for i in 0 ..< n:
@@ -93,6 +100,8 @@ iterator items*(g: MultiPolygon): Polygon =
   ## .. code-block:: nim
   ##   for poly in multiPolygon:
   ##     echo poly.area()
+  ##
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("items(MultiPolygon)")
   let n = g.numGeometries()
   for i in 0 ..< n:
@@ -106,6 +115,8 @@ iterator items*(g: GeometryCollection): Geometry =
   ## .. code-block:: nim
   ##   for geom in geometryCollection:
   ##     echo geom.type()
+  ##
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("items(GeometryCollection)")
   let n = g.numGeometries()
   for i in 0 ..< n:

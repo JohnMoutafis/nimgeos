@@ -45,4 +45,4 @@ task testEdgeCases, "Run edge case tests":
     exec "nim r --hints:off " & file
 
 task docs, "Build documentation":
-  exec "nim doc --hints:off src/nimgeos.nim"
+  exec "nim doc --project --index:on --hints:off src/nimgeos.nim"

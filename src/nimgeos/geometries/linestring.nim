@@ -1,4 +1,5 @@
 ## LineString geometry type and operations.
+## See also: `docs/geometries/linestring.md`.
 
 import ../private/geos_abi
 import ../context
@@ -7,10 +8,9 @@ import ../geometry
 import ./point
 
 type
-  ## A LineString geometry — a path defined by a sequence of points.
   LineStringObj* = object of GeometryObj
-  ## Reference type for a LineString geometry.
-  LineString* = ref LineStringObj
+    ## A LineString geometry — a path defined by a sequence of points.
+  LineString* = ref LineStringObj ## Reference type for a LineString geometry.
 proc validateCoords[T](ctx: GeosContext; coords: openArray[T]): GEOSCoordSequence =
   ## Shared validation and CoordSequence construction for LineString.
   ## GEOS requires at least 2 points.
@@ -32,6 +32,14 @@ proc validateCoords[T](ctx: GeosContext; coords: openArray[T]): GEOSCoordSequenc
 proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float)]): LineString =
   ## Create a 2D LineString from an array of (x, y) tuples.
   ## Requires at least 2 coordinates.
+  ##
+  ## .. code-block:: nim
+  ##   var ctx = initGeosContext()
+  ##   let ls = ctx.createLineString([(0.0, 0.0), (3.0, 4.0)])
+  ##   echo ls.numPoints()   # 2
+  ##
+  ## Raises `GeosInitError` if `ctx` is destroyed; `GeosGeomError` if fewer
+  ## than 2 coordinates or GEOS fails.
   checkContext(ctx, "createLineString")
   let sq = validateCoords(ctx, coords)
   let handle = GEOSGeom_createLineString_r(ctx.handle, sq)
@@ -42,6 +50,8 @@ proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float)]):
 proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float, float)]): LineString =
   ## Create a 3D LineString from an array of (x, y, z) tuples.
   ## Requires at least 2 coordinates.
+  ## Raises `GeosInitError` if `ctx` is destroyed; `GeosGeomError` if fewer
+  ## than 2 coordinates or GEOS fails.
   checkContext(ctx, "createLineString")
   let sq = validateCoords(ctx, coords)
   let handle = GEOSGeom_createLineString_r(ctx.handle, sq)
@@ -51,12 +61,13 @@ proc createLineString*(ctx: var GeosContext; coords: openArray[(float, float, fl
 
 proc numPoints*(ls: LineString): int =
   ## Return the number of points in the LineString.
+  ## Raises `GeosGeomError` if the LineString is nil or GEOS fails.
   ls.checkHandle("numPoints")
   GEOSGeomGetNumPoints_r(ls.ctx.handle, ls.handle).int
 
 proc pointN*(ls: LineString; n: int): Point =
   ## Return the point at index `n` (0-based).
-  ## Raises `GeosGeomError` if `n` is out of bounds.
+  ## Raises `GeosGeomError` if `n` is out of bounds or the LineString is nil.
   ls.checkHandle("pointN")
   if n < 0 or n >= ls.numPoints():
     raise newException(GeosGeomError, "pointN index out of bounds: " & $n)
@@ -68,6 +79,7 @@ proc pointN*(ls: LineString; n: int): Point =
 
 proc startPoint*(ls: LineString): Point =
   ## Return the first point of the LineString.
+  ## Raises `GeosGeomError` if the LineString is nil or GEOS fails.
   ls.checkHandle("startPoint")
   let handle = GEOSGeomGetStartPoint_r(ls.ctx.handle, ls.handle)
   if cast[pointer](handle) == nil:
@@ -76,6 +88,7 @@ proc startPoint*(ls: LineString): Point =
 
 proc endPoint*(ls: LineString): Point =
   ## Return the last point of the LineString.
+  ## Raises `GeosGeomError` if the LineString is nil or GEOS fails.
   ls.checkHandle("endPoint")
   let handle = GEOSGeomGetEndPoint_r(ls.ctx.handle, ls.handle)
   if cast[pointer](handle) == nil:
@@ -83,6 +96,8 @@ proc endPoint*(ls: LineString): Point =
   return Point(ctx: ls.ctx, handle: handle)
 
 ## String representation — returns "LineString(N points)" where N is the point count.
+## Raises `NilAccessDefect` if the LineString is nil.
 method `$`*(ls: LineString): string =
-  if ls == nil or cast[pointer](ls.handle) == nil: return "<nil LineString>"
+  if ls == nil or cast[pointer](ls.handle) == nil:
+    raise newException(NilAccessDefect, "Cannot convert nil LineString to string")
   return "LineString(" & $ls.numPoints() & " points)"

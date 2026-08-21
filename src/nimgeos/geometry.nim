@@ -1,5 +1,6 @@
 ## Base Geometry type. All concrete types inherit from this.
 ## Owns the GEOSGeometry handle — destroyed when ref count hits zero.
+## See also: `docs/geometries/overview.md`.
 
 import ./private/geos_abi
 import ./context
@@ -22,7 +23,8 @@ type
     ## Internal base — never instantiate directly. Use concrete subtypes.
     ctx*:    ptr GeosContext    ## Internal — not part of stable API. Subject to change.
     handle*: GEOSGeometry      ## Internal — not part of stable API. Subject to change.
-  Geometry* = ref GeometryObj
+  Geometry* = ref GeometryObj ## Base reference type for all concrete geometries
+                              ## (Point, LineString, LinearRing, Polygon, multi-geometries, GeometryCollection).
 
 
 # ── Lifecycle hooks ────────────────────────────────────────────────────────────
@@ -33,6 +35,7 @@ proc `=destroy`*(g: GeometryObj) =
 
 proc `=copy`*(dst: var GeometryObj; src: GeometryObj) =
   ## Deep copy via GEOSGeom_clone_r — never copies the raw pointer.
+  ## Shares the context pointer; only the GEOS handle is deep-cloned.
   if cast[pointer](src.handle) == nil or src.ctx == nil:
     dst.ctx    = nil
     dst.handle = cast[GEOSGeometry](nil)
@@ -43,6 +46,7 @@ proc `=copy`*(dst: var GeometryObj; src: GeometryObj) =
 proc `=dup`*(src: GeometryObj): GeometryObj =
   ## Hook for deep copy via GEOSGeom_clone_r — called by the compiler when a
   ## GeometryObj is moved or assigned, ensuring independent GEOS handle ownership.
+  ## Shares the context pointer; only the GEOS handle is deep-cloned.
   if cast[pointer](src.handle) == nil or src.ctx == nil:
     return
   result.ctx    = src.ctx
@@ -50,6 +54,8 @@ proc `=dup`*(src: GeometryObj): GeometryObj =
 
 proc clone*(g: Geometry): Geometry =
   ## Deep copy via GEOSGeom_clone_r — returns a new independent Geometry ref.
+  ## The caller owns the returned Geometry; the original is unaffected.
+  ## Returns `nil` if `g` is nil or its handle is nil.
   if g == nil or cast[pointer](g.handle) == nil or g.ctx == nil:
     return nil
   return  Geometry(
@@ -73,14 +79,16 @@ proc wrapHandle*(ctx: ptr GeosContext; handle: GEOSGeometry): Geometry =
 
 # ── Representation ─────────────────────────────────────────────────────
 method `$`*(g: Geometry): string {.base.} =
-  ## String representation — returns the concrete type name or ``"<nil Geometry>"``.
+  ## String representation — returns the concrete type name.
+  ## Raises `NilAccessDefect` if the Geometry is nil.
   if g == nil or cast[pointer](g.handle) == nil:
-    return "<nil Geometry>"
+    raise newException(NilAccessDefect, "Cannot convert nil Geometry to string")
   "<Geometry: " & $g.type() & ">"
 
 # ── Property accessors ────────────────────────────────────────────────────────
 proc type*(g: Geometry): GeomType =
   ## Returns the concrete GEOS geometry type of `g` (e.g. `gtPoint`, `gtPolygon`).
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("type")
   let id = GEOSGeomTypeId_r(g.ctx.handle, g.handle)
   if id < 0:
@@ -89,17 +97,20 @@ proc type*(g: Geometry): GeomType =
 
 proc isEmpty*(g: Geometry): bool =
   ## Returns `true` if the geometry has no coordinates.
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("isEmpty")
   return ord(GEOSisEmpty_r(g.ctx.handle, g.handle)) == 1
 
 proc isValid*(g: Geometry): bool =
   ## Returns `true` if the geometry is topologically valid per OGC rules.
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("isValid")
   return ord(GEOSisValid_r(g.ctx.handle, g.handle)) == 1
 
 proc numCoordinates*(g: Geometry): int =
   ## Returns the total number of coordinate points in the geometry.
   ## For multi-geometries, this includes all sub-geometry coordinates.
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("numCoordinates")
   return GEOSGetNumCoordinates_r(g.ctx.handle, g.handle).int
 
@@ -107,6 +118,7 @@ proc numGeometries*(g: Geometry): int =
   ## Returns the number of component geometries.
   ## For simple geometries (Point, LineString, Polygon) this is 1.
   ## For multi-geometries this is the member count.
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("numGeometries")
   return GEOSGetNumGeometries_r(g.ctx.handle, g.handle).int
 
@@ -114,6 +126,7 @@ proc area*(g: Geometry): float =
   ## Returns the planar area of the geometry.
   ## For polygons and multi-polygons this computes the surface area.
   ## Returns 0.0 for non-polygonal geometries.
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("area")
   var a: cdouble
   if GEOSArea_r(g.ctx.handle, g.handle, addr a) == 0:
@@ -125,6 +138,7 @@ proc length*(g: Geometry): float =
   ## For LineStrings this is the path length.
   ## For Polygons this is the perimeter (including holes).
   ## Returns 0.0 for points.
+  ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("length")
   var l: cdouble
   if GEOSLength_r(g.ctx.handle, g.handle, addr l) == 0:
