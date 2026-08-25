@@ -71,10 +71,6 @@ proc prepare*(g: Geometry): PreparedGeometry =
     handle: prepHandle
   )
 
-proc toPreparedGeometry*(g: Geometry): PreparedGeometry {.deprecated: "Use prepare instead".} =
-  ## Old name — kept for compatibility until 2.0.0.
-  g.prepare()
-
 proc preparedContains*(pg: PreparedGeometry; other: Geometry): bool =
   ## Returns `true` when `pg` contains `other`.
   ## Raises `GeosGeomError` if either argument is nil or GEOS returns an exception.

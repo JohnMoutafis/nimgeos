@@ -150,6 +150,3 @@ proc boundary*(g: Geometry): Geometry =
   ## Raises `GeosGeomError` if `g` is nil or GEOS fails.
   evalUnaryOp(g, "boundary", GEOSBoundary_r)
 
-proc boundaryOp*(g: Geometry): Geometry {.deprecated: "Use boundary instead".} =
-  ## Old name — kept for compatibility until 2.0.0.
-  g.boundary()

@@ -84,6 +84,8 @@ nimble testEdgeCases          # edge cases
 
 ## Supported platforms
 
+Minimum versions: **Nim ≥ 2.0.0 · GEOS (`libgeos_c`) ≥ 3.8**.
+
 | Platform     | Status      | CI                        |
 |--------------|-------------|---------------------------|
 | Ubuntu       | ✅ Supported | Full CI on every PR/push  |
@@ -92,14 +94,9 @@ nimble testEdgeCases          # edge cases
 
 Nim versions: **stable** (required, CI-gated) and **devel** (CI runs but allow-failure).
 
+Full support matrix, geometry expectations, and error/context guarantees: [Support Policy](docs/support.md).
+
 See [installation guide](docs/getting-started/installation.md) for platform-specific prerequisites and [CONTRIBUTING.md](CONTRIBUTING.md) for CI policy.
-
-## Deprecated APIs (removed in 2.0.0)
-
-| Old name               | Replacement       |
-|------------------------|-------------------|
-| `boundaryOp(g)`        | `boundary(g)`     |
-| `toPreparedGeometry(g)`| `prepare(g)`      |
 
 ## License
 
