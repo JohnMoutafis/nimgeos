@@ -71,7 +71,7 @@ echo p3d   # Point (1.0 2.0 3.0)
 
 ## API reference
 
-Generated HTML documentation is available at the [GitHub Pages site](https://johnmoutafis.github.io/nimgeos/)
+Online API documentation is available at the [GitHub Pages site](https://johnmoutafis.github.io/nimgeos/)
 
 ---
 
