@@ -511,22 +511,22 @@ suite "Spatial operations — unary on empty geometries":
     let result = g.unaryUnion()
     check result.isEmpty()
 
-  test "boundaryOp of empty point is empty":
+  test "boundary of empty point is empty":
     var ctx = initGeosContext()
     let g = ctx.fromWKT(emptyPoint)
-    let result = g.boundaryOp()
+    let result = g.boundary()
     check result.isEmpty()
 
-  test "boundaryOp of empty linestring is empty":
+  test "boundary of empty linestring is empty":
     var ctx = initGeosContext()
     let g = ctx.fromWKT(emptyLineString)
-    let result = g.boundaryOp()
+    let result = g.boundary()
     check result.isEmpty()
 
-  test "boundaryOp of empty polygon is empty":
+  test "boundary of empty polygon is empty":
     var ctx = initGeosContext()
     let g = ctx.fromWKT(emptyPolygon)
-    let result = g.boundaryOp()
+    let result = g.boundary()
     check result.isEmpty()
 
 
@@ -942,10 +942,10 @@ suite "Empty geometry — operations produce correct types":
     let h = g.convexHull()
     check h.isEmpty()
 
-  test "boundaryOp of MULTIPOLYGON EMPTY is empty":
+  test "boundary of MULTIPOLYGON EMPTY is empty":
     var ctx = initGeosContext()
     let g = ctx.fromWKT(emptyMultiPolygon)
-    let b = g.boundaryOp()
+    let b = g.boundary()
     check b.isEmpty()
 
   test "buffer of GEOMETRYCOLLECTION EMPTY is empty":

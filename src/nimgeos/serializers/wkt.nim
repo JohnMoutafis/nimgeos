@@ -1,4 +1,5 @@
 ## A WKT (Well-Known Text) serializer for Nimgeos.
+## See also: `docs/serialization/wkt.md`.
 
 import ../private/geos_abi
 import ../context
@@ -8,7 +9,15 @@ import ../errors
 
 # -- WKT Deserialization ────────────────────────────────────────────────────────
 proc fromWKT*(ctx: var GeosContext; wkt: string): Geometry =
-  ## Parse any WKT string into the corresponding concrete Geometry.
+  ## Parse the WKT string `wkt` into the corresponding concrete Geometry.
+  ##
+  ## .. code-block:: nim
+  ##   var ctx = initGeosContext()
+  ##   let g = ctx.fromWKT("POINT (1 2)")
+  ##   echo g.type()   # gtPoint
+  ##
+  ## Raises `GeosInitError` if `ctx` is destroyed; `GeosParseError` if the
+  ## WKT string is malformed.
   checkContext(ctx, "fromWKT")
   let reader = GEOSWKTReader_create_r(ctx.handle)
   if cast[pointer](reader) == nil:
@@ -21,7 +30,13 @@ proc fromWKT*(ctx: var GeosContext; wkt: string): Geometry =
 
 # -- WKT Serialization ──────────────────────────────────────────────────────────
 proc toWKT*(g: Geometry): string =
-  ## Serialize a `Geometry` to WKT.
+  ## Serialize `g` to a WKT string.
+  ##
+  ## .. code-block:: nim
+  ##   var ctx = initGeosContext()
+  ##   echo ctx.createPoint(1.0, 2.0).toWKT()   # POINT (1 2)
+  ##
+  ## Raises `GeosGeomError` if `g` is nil or serialization fails.
   checkHandle(g, "toWKT")
   let writer = GEOSWKTWriter_create_r(g.ctx.handle)
   if cast[pointer](writer) == nil:

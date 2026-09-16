@@ -1,4 +1,5 @@
 ## A WKB (Well-Known Binary) serializer for Nimgeos.
+## See also: `docs/serialization/wkb.md`.
 
 import ../private/geos_abi
 import ../context
@@ -28,7 +29,9 @@ proc parseHexDigit(c: char): int =
 # ── WKB Deserialization ───────────────────────────────────────────────────────
 
 proc fromWKB*(ctx: var GeosContext; wkb: openArray[byte]): Geometry =
-  ## Parse a WKB byte sequence into the corresponding concrete Geometry.
+  ## Parse the WKB byte sequence `wkb` into the corresponding concrete Geometry.
+  ## Raises `GeosInitError` if `ctx` is destroyed; `GeosParseError` if the
+  ## input is empty or malformed.
   checkContext(ctx, "fromWKB")
   if wkb.len == 0:
     raise newException(GeosParseError, "Cannot parse empty WKB")
@@ -45,8 +48,16 @@ proc fromWKB*(ctx: var GeosContext; wkb: openArray[byte]): Geometry =
 # ── WKB Serialization ─────────────────────────────────────────────────────────
 
 proc toWKB*(g: Geometry; byteOrder: WkbByteOrder = wkbNDR): seq[byte] =
-  ## Serialize a `Geometry` to a WKB byte sequence.
-  ## byteOrder selects Little-Endian NDR (default) or Big-Endian XDR.
+  ## Serialize `g` to a WKB byte sequence.
+  ## `byteOrder` selects Little-Endian NDR (default) or Big-Endian XDR.
+  ##
+  ## .. code-block:: nim
+  ##   var ctx = initGeosContext()
+  ##   let bytes = ctx.createPoint(1.0, 2.0).toWKB()
+  ##   let back  = ctx.fromWKB(bytes)
+  ##   echo back.toWKT()   # POINT (1 2)
+  ##
+  ## Raises `GeosGeomError` if `g` is nil or serialization fails.
   checkHandle(g, "toWKB")
   let writer = GEOSWKBWriter_create_r(g.ctx.handle)
   if cast[pointer](writer) == nil:
@@ -64,7 +75,8 @@ proc toWKB*(g: Geometry; byteOrder: WkbByteOrder = wkbNDR): seq[byte] =
 # ── Hex WKB ───────────────────────────────────────────────────────────────────
 
 proc toHexWKB*(g: Geometry; byteOrder: WkbByteOrder = wkbNDR): string =
-  ## Serialize a `Geometry` to an uppercase hex-encoded WKB string.
+  ## Serialize `g` to an uppercase hex-encoded WKB string.
+  ## Raises `GeosGeomError` if `g` is nil or serialization fails.
   const hexChars = "0123456789ABCDEF"
   let bytes = g.toWKB(byteOrder)
   result = newStringOfCap(bytes.len * 2)
@@ -73,7 +85,10 @@ proc toHexWKB*(g: Geometry; byteOrder: WkbByteOrder = wkbNDR): string =
     result.add(hexChars[b.int and 0x0F])
 
 proc fromHexWKB*(ctx: var GeosContext; hex: string): Geometry =
-  ## Parse a hex-encoded WKB string into the corresponding concrete Geometry.
+  ## Parse the hex-encoded WKB string `hex` into the corresponding concrete
+  ## Geometry.
+  ## Raises `GeosParseError` if `hex` is empty, of odd length, or contains a
+  ## non-hex character; `GeosInitError` if `ctx` is destroyed.
   if hex.len == 0 or hex.len mod 2 != 0:
     raise newException(GeosParseError,
       "Invalid hex WKB string: length must be non-zero and even, got " & $hex.len)

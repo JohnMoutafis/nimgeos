@@ -548,36 +548,36 @@ suite "snap":
     expect GeosGeomError:
       discard a.snap(b, 0.5)
 
-# ── boundaryOp ────────────────────────────────────────────────────────────────
+# ── boundary ───────────────────────────────────────────────────────────────────
 
-suite "boundaryOp":
+suite "boundary":
   test "boundary of polygon is linestring or multiline":
     var ctx = initGeosContext()
     let p = ctx.fromWKT(polyA)
-    let b = p.boundaryOp()
+    let b = p.boundary()
     check (b of LineString) or (b of MultiLineString)
 
   test "boundary of linestring is two endpoints":
     var ctx = initGeosContext()
     let l = LineString(ctx.fromWKT("LINESTRING (0 0, 2 2, 4 4)"))
-    let b = l.boundaryOp()
+    let b = l.boundary()
     check b of MultiPoint
     check b.numGeometries() == 2
 
   test "boundary of point is empty":
     var ctx = initGeosContext()
     let p = ctx.fromWKT("POINT (1 1)")
-    check p.boundaryOp().isEmpty()
+    check p.boundary().isEmpty()
 
   test "boundary of empty point is empty":
     var ctx = initGeosContext()
     let g = ctx.fromWKT("POINT EMPTY")
-    check g.boundaryOp().isEmpty()
+    check g.boundary().isEmpty()
 
   test "Nil Safety: g nil raises GeosGeomError":
     var g: Geometry
     expect GeosGeomError:
-      discard g.boundaryOp()
+      discard g.boundary()
 
 # ── Extended operation invariants ─────────────────────────────────────────────
 
@@ -591,7 +591,7 @@ suite "Extended operation invariants":
   test "point boundary is empty set":
     var ctx = initGeosContext()
     let p = ctx.fromWKT("POINT (0 0)")
-    check p.boundaryOp().isEmpty()
+    check p.boundary().isEmpty()
 
   test "hole structure survives topology-preserving simplify":
     var ctx = initGeosContext()

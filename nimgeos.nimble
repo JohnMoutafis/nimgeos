@@ -1,5 +1,5 @@
 # Package
-version       = "0.9.0"
+version       = "1.0.0"
 author        = "John Moutafis"
 description   = "Nim wrapper for the GEOS geometry engine (libgeos_c)"
 license       = "MIT"
@@ -43,3 +43,6 @@ task testEdgeCases, "Run edge case tests":
   for file in findTestFiles("tests/test_edge_cases"):
     echo "Running: " & file
     exec "nim r --hints:off " & file
+
+task docs, "Build documentation":
+  exec "nim doc --project --index:on --hints:off src/nimgeos.nim"

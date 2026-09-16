@@ -18,16 +18,13 @@ suite "Point with NaN coordinates":
     var ctx = initGeosContext()
     try:
       let p = ctx.createPoint(NaN, NaN)
-      check not p.isValid()
-    except GeosGeomError:
-      check true
-
-  test "Point with NaN coords is not empty":
-    var ctx = initGeosContext()
-    try:
-      let p = ctx.createPoint(NaN, NaN)
-      # NaN point is technically not EMPTY — it has coordinates, just invalid ones
-      check not p.isEmpty()
+      # GEOS never treats a NaN point as a normal valid geometry:
+      # ≤3.12 creates an empty point; ≥3.13 keeps the point but flags
+      # the NaN coordinates as invalid.
+      if p.isEmpty():
+        check true   # empty is GEOS ≤3.12's degenerate form
+      else:
+        check not p.isValid()
     except GeosGeomError:
       check true
 
