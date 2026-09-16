@@ -15,21 +15,22 @@ import ../errors
 # ── Internal helpers: Serialization ───────────────────────────────────────────
 
 proc coordSeqDims(ctx: GEOSContextHandle_t; cs: GEOSCoordSequence): int =
-  var dims: cuint
+  var dims: cuint = 0
   discard GEOSCoordSeq_getDimensions_r(ctx, cs, addr dims)
   return dims.int
 
 proc coordSeqLen(ctx: GEOSContextHandle_t; cs: GEOSCoordSequence): int =
-  var size: cuint
+  var size: cuint = 0
   discard GEOSCoordSeq_getSize_r(ctx, cs, addr size)
   return size.int
 
 proc coordToJson(ctx: GEOSContextHandle_t; cs: GEOSCoordSequence; idx: int; dims: int): JsonNode =
-  var x, y: cdouble
+  var x: cdouble = 0.0
+  var y: cdouble = 0.0
   discard GEOSCoordSeq_getX_r(ctx, cs, idx.cuint, addr x)
   discard GEOSCoordSeq_getY_r(ctx, cs, idx.cuint, addr y)
   if dims >= 3:
-    var z: cdouble
+    var z: cdouble = NaN
     discard GEOSCoordSeq_getZ_r(ctx, cs, idx.cuint, addr z)
     if not z.isNaN:
       return %* [x.float, y.float, z.float]

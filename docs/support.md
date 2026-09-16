@@ -1,6 +1,6 @@
 # Support Policy
 
-The supported configurations, version guarantees, and behavioral contracts of nimgeos 1.0.0. For runtime edge-case details, see [Edge Cases](edge-cases.md).
+The supported configurations, version guarantees, and behavioral contracts of nimgeos 1.0.0.
 
 ---
 
@@ -28,8 +28,8 @@ nimgeos follows [Semantic Versioning](https://semver.org/). Within a major versi
 
 - **2D geometries** — fully supported across construction, predicates, operations, and serialization.
 - **3D (Z) geometries** — supported for construction (`createPoint(x, y, z)`), coordinate access (`z()`, CoordSeq `items3D`), and serialization (WKB output dimension, GeoJSON 3-value coordinates).
-- **Empty geometries** (`POINT EMPTY`, …) — behavior per operation is defined; see [Empty geometries](edge-cases.md#empty-geometries).
-- **NaN / ±Inf coordinates** — accepted at creation time, downstream results undefined; see [Special floating-point values](edge-cases.md#special-floating-point-values).
+- **Empty geometries** (`POINT EMPTY`, …) — behavior per operation is defined; see [Empty geometries](geometries/empty-geometries.md).
+- **NaN / ±Inf coordinates** — accepted at creation time, downstream results undefined; see [Special floating-point values](geometries/special-values.md).
 
 ## Error & exception guarantees
 
@@ -41,7 +41,7 @@ Every failure raises an exception from the `GeosError` hierarchy — operations 
 
 Nil-handle misuse raises `GeosGeomError` labelled `"<op> called on nil Geometry"`. String conversion (`$`) of a nil geometry deliberately raises `NilAccessDefect` instead — a `Defect`, which is not catchable as `CatchableError`.
 
-Full trigger lists and examples: [Edge cases → Error types](edge-cases.md#error-types).
+Full trigger lists and examples: [Error types](patterns/error-types.md) and [Nil-safety](patterns/nil-safety.md).
 
 ## Context lifetime limitations
 

@@ -48,13 +48,14 @@ proc copyCoordSeq(ctxHandle: GEOSContextHandle_t;
   ## Copy all coordinates from `src` into `dst`.
   ## Both sequences must already be allocated with matching size/dims.
   for i in 0 ..< size:
-    var x, y: cdouble
+    var x: cdouble = 0.0
+    var y: cdouble = 0.0
     discard GEOSCoordSeq_getX_r(ctxHandle, src, i.cuint, addr x)
     discard GEOSCoordSeq_getY_r(ctxHandle, src, i.cuint, addr y)
     discard GEOSCoordSeq_setX_r(ctxHandle, dst, i.cuint, x)
     discard GEOSCoordSeq_setY_r(ctxHandle, dst, i.cuint, y)
     if dims >= 3:
-      var z: cdouble
+      var z: cdouble = NaN
       discard GEOSCoordSeq_getZ_r(ctxHandle, src, i.cuint, addr z)
       discard GEOSCoordSeq_setZ_r(ctxHandle, dst, i.cuint, z)
 
@@ -156,7 +157,7 @@ proc getX*(cs: CoordSeq; idx: int): float =
   ## Get the X value at index `idx`.
   ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("getX")
-  var v: cdouble
+  var v: cdouble = 0.0
   if GEOSCoordSeq_getX_r(cs.ctx.handle, cs.handle, idx.cuint, addr v) == 0:
     raise newException(GeosGeomError, "GEOSCoordSeq_getX_r failed at index " & $idx)
   v.float
@@ -165,7 +166,7 @@ proc getY*(cs: CoordSeq; idx: int): float =
   ## Get the Y value at index `idx`.
   ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("getY")
-  var v: cdouble
+  var v: cdouble = 0.0
   if GEOSCoordSeq_getY_r(cs.ctx.handle, cs.handle, idx.cuint, addr v) == 0:
     raise newException(GeosGeomError, "GEOSCoordSeq_getY_r failed at index " & $idx)
   v.float
@@ -174,7 +175,7 @@ proc getZ*(cs: CoordSeq; idx: int): float =
   ## Get the Z value at index `idx`.
   ## Raises `GeosGeomError` if the sequence is nil or the index is invalid.
   cs.checkHandle("getZ")
-  var v: cdouble
+  var v: cdouble = NaN
   if GEOSCoordSeq_getZ_r(cs.ctx.handle, cs.handle, idx.cuint, addr v) == 0:
     raise newException(GeosGeomError, "GEOSCoordSeq_getZ_r failed at index " & $idx)
   v.float
@@ -237,7 +238,8 @@ iterator items*(cs: CoordSeq): (float, float) =
   cs.checkHandle("items(CoordSeq)")
   let n = cs.len
   for i in 0 ..< n:
-    var x, y: cdouble
+    var x: cdouble = 0.0
+    var y: cdouble = 0.0
     discard GEOSCoordSeq_getX_r(cs.ctx.handle, cs.handle, i.cuint, addr x)
     discard GEOSCoordSeq_getY_r(cs.ctx.handle, cs.handle, i.cuint, addr y)
     yield (x.float, y.float)

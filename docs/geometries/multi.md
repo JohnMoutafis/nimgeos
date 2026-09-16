@@ -119,26 +119,26 @@ var ctx = initGeosContext()
 
 # Build a MultiPoint from individual Points
 var pts: seq[Geometry] = @[
-  ctx.createPoint(0.0, 0.0),
-  ctx.createPoint(1.0, 1.0),
-  ctx.createPoint(2.0, 2.0),
+  Geometry(ctx.createPoint(0.0, 0.0)),
+  Geometry(ctx.createPoint(1.0, 1.0)),
+  Geometry(ctx.createPoint(2.0, 2.0)),
 ]
 let mp = ctx.createMultiGeometry(pts)
 
 echo mp.numGeometries()  # 3
 
 # Iterate
-for pt in mp:
+for pt in mp.MultiPoint:
   echo "(", pt.x(), ", ", pt.y(), ")"
 
 # Build a GeometryCollection from mixed types
 var mixed: seq[Geometry] = @[
-  ctx.createPoint(3.0, 4.0),
-  ctx.createLineString([(0.0, 0.0), (5.0, 5.0)]),
+  Geometry(ctx.createPoint(3.0, 4.0)),
+  Geometry(ctx.createLineString([(0.0, 0.0), (5.0, 5.0)])),
 ]
 let coll = ctx.createMultiGeometry(mixed)
 echo coll.type()  # gtGeometryCollection
 
-for geom in coll:
+for geom in coll.GeometryCollection:
   echo geom.type()
 ```

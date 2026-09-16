@@ -89,3 +89,30 @@ proc process(ctx: var GeosContext) =
 ## Thread safety
 
 GEOS contexts are single-threaded. Create one context per thread; never share a context across threads without external synchronisation.
+
+## Cross-context operations
+
+Using geometries from different `GeosContext` objects in the same operation is **undefined behavior**. GEOS contexts are independent of each other and geometries created in one context must not be used with another.
+
+```nim
+var ctxA = initGeosContext()
+var ctxB = initGeosContext()
+
+let ptA = ctxA.createPoint(0.0, 0.0)
+let ptB = ctxB.createPoint(1.0, 1.0)
+
+# UNDEFINED: geometries from different contexts
+# let dist = ptA.distance(ptB)
+```
+
+Always use the same `GeosContext` for a given computation chain. When using `withGeosContext`, any geometries that escape the block reference a destroyed context and must not be used after the block exits.
+
+## Ownership transfer
+
+Constructors that take ownership of input handles **neutralize** those handles. After calling `createPolygon`, `createMultiGeometry`, or similar, the input variables must not be used:
+
+```nim
+let shell = ctx.createLinearRing(/* ... */)
+let poly  = ctx.createPolygon(shell)
+# shell.handle is now nil — do not use `shell`
+```

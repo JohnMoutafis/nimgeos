@@ -22,7 +22,7 @@ All predicates accept a `Geometry` and a second `Geometry` from the same `GeosCo
 ```nim
 import nimgeos
 
-let ctx = initGeosContext()
+var ctx = initGeosContext()
 
 let polygon = ctx.fromWKT("POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0))")
 let pointInside  = ctx.fromWKT("POINT (5 5)")

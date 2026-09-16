@@ -64,23 +64,16 @@ echo p3d   # Point (1.0 2.0 3.0)
 
 ### Edge cases & error handling
 
-- [Edge cases](docs/edge-cases.md) — Empty geometries, special floats, error types (`GeosInitError`, `GeosGeomError`, `GeosParseError`), nil-safety, cross-context operations, ownership transfer
+- [Empty geometries](docs/geometries/empty-geometries.md) — `isEmpty`, per-operation behavior
+- [Special floating-point values](docs/geometries/special-values.md) — NaN, infinity, Z on 2D geometries
+- [Error types](docs/patterns/error-types.md) — `GeosInitError`, `GeosGeomError`, `GeosParseError`
+- [Nil-safety](docs/patterns/nil-safety.md) — nil-handle guards and `$` behavior
 
 ## API reference
 
 Generated HTML documentation is available at the [GitHub Pages site](https://johnmoutafis.github.io/nimgeos/)
 
-## Running the tests
-
-```sh
-nimble test                   # all tests
-nimble testGeometries         # geometry tests
-nimble testSerializers        # WKT, WKB, GeoJSON
-nimble testPredicates         # spatial predicates
-nimble testSpatialOperations  # spatial operations
-nimble testPreparedGeom       # prepared geometry
-nimble testEdgeCases          # edge cases
-```
+---
 
 ## Supported platforms
 

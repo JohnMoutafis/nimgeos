@@ -31,6 +31,8 @@ Windows support is experimental. GEOS binaries can be obtained from [vcpkg](http
 vcpkg install geos
 ```
 
+With the MSVC toolchain the linker must find the import library (`geos_c.lib`) through the `LIB` environment variable and `geos_c.dll` through `PATH` — with vcpkg those are the `installed\<triplet>\lib` and `installed\<triplet>\bin` directories. With MinGW, `libgeos_c` must be on the linker's search path (`-lgeos_c`).
+
 ## Verify the installation
 
 Confirm that `geos-config` is on your `PATH` and reports a version:

@@ -63,6 +63,8 @@ nav:
     - Multi-geometries: geometries/multi.md
     - Prepared Geometry: geometries/prepared.md
     - CoordSeq: geometries/coord-seq.md
+    - Empty Geometries: geometries/empty-geometries.md
+    - Special Floating-Point Values: geometries/special-values.md
   - Serialization:
     - WKT: serialization/wkt.md
     - WKB: serialization/wkb.md
@@ -70,8 +72,15 @@ nav:
   - Operations:
     - Predicates: operations/predicates.md
     - Spatial Operations: operations/spatial-operations.md
-  - Edge Cases: edge-cases.md
+  - Patterns:
+    - Error Types: patterns/error-types.md
+    - Nil-Safety: patterns/nil-safety.md
   - Support Policy: support.md
+  - Contributing:
+    - Development Setup: contributing/setup.md
+    - Testing & CI: contributing/testing.md
+    - Code Style: contributing/code-style.md
+    - Release Process: contributing/release-process.md
   - API Reference: api/nimgeos.html
 
 extra:

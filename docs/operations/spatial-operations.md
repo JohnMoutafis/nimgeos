@@ -35,7 +35,7 @@ Produce new `Geometry` instances from one or two input geometries. All operation
 ```nim
 import nimgeos
 
-let ctx = initGeosContext()
+var ctx = initGeosContext()
 
 let road = ctx.fromWKT("LINESTRING (0 0, 100 0)")
 
@@ -46,7 +46,7 @@ let building = ctx.fromWKT("POLYGON ((30 -5, 40 -5, 40 5, 30 5, 30 -5))")
 
 # Find the overlapping area
 let overlap = corridor.intersection(building)
-echo overlap.toWKT()  # POLYGON ((30 -5, 40 -5, 40 5, 30 5, 30 -5))
+echo overlap.toWKT()  # POLYGON ((30 -5, 30 5, 40 5, 40 -5, 30 -5))
 
 # Simplify a noisy boundary
 let noisy = ctx.fromWKT("POLYGON ((0 0, 5 0.1, 10 0, 10 10, 0 10, 0 0))")

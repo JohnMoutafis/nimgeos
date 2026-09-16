@@ -28,7 +28,7 @@ All procedures raise `GeosInitError` on writer/reader creation failure and `Geos
 ```nim
 import nimgeos
 
-let ctx = initGeosContext()
+var ctx = initGeosContext()
 let original = ctx.fromWKT("POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0))")
 
 # Serialize to binary WKB (little-endian)

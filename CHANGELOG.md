@@ -7,21 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] - 2026-06-19
+## [1.0.0] - 2026-09-16
+
+First stable release — the public API is frozen: no incompatible changes before 2.0.
+
+### Highlights
+
+- **Geometry toolkit** — `Point`, `LineString`, `LinearRing`, `Polygon`, `MultiPoint`,
+  `MultiLineString`, `MultiPolygon` and `GeometryCollection` built from plain Nim tuples
+  (`createPoint`, `createLineString`, `createLinearRing`, `createPolygon`, `createMultiGeometry`),
+  `CoordSeq` for raw coordinate access, and `prepare(g)` for accelerated repeated predicates.
+- **Predicates** — `equals`, `intersects`, `contains`, `within`, `touches`, `disjoint`, `crosses`,
+  `overlaps`, plus the prepared variants `preparedContains`, `preparedIntersects`, `preparedCovers`,
+  `preparedCoveredBy`.
+- **Spatial operations** — `intersection`, `union`, `difference`, `symmetricDifference`,
+  `unaryUnion`, `convexHull`, `envelope`, `centroid`, `boundary`, `buffer`, `simplify`,
+  `topologyPreserveSimplify`, `snap`.
+- **Serialization** — WKT (`toWKT` / `fromWKT`), WKB (`toWKB` / `fromWKB` with NDR/XDR byte order,
+  `toHexWKB` / `fromHexWKB`) and GeoJSON (`toGeoJSON` / `fromGeoJSON`) round-trips.
+- **Iteration and indexing** — `items` iterators for every multi-geometry type and for `CoordSeq`
+  (`items`, `items3D`), and `geomN` for concrete-typed sub-geometry access.
+- **Documentation** — a user guide covering installation, context lifecycle, every geometry type,
+  serialization, operations, error handling and edge cases, plus a support policy, contributor
+  guides and a generated API reference, published at
+  <https://johnmoutafis.github.io/nimgeos/>.
+- **AGENTS.md** — General guidelines for use of and contribution to the library from AI agents.
+
+### Guarantees
+
+- **No silent failures** — every failure raises from the `GeosError` hierarchy: `GeosInitError`
+  (context, reader or writer creation; use of a destroyed context), `GeosGeomError` (operation
+  failure, nil handles, out-of-bounds indices) or `GeosParseError` (malformed WKT/WKB/hex-WKB/GeoJSON).
+- **Deterministic memory** — geometry, context and coordinate-sequence handles are owned through
+  ORC lifecycle hooks; no manual cleanup, no GC-managed handle lifetime.
+- **Nil safety** — nil handles raise `GeosGeomError` labelled `"<op> called on nil Geometry"`;
+  `$` on a nil geometry raises `NilAccessDefect`.
+- **Explicit context lifetime** — one context per thread, a context must outlive everything derived
+  from it, and `withGeosContext` scopes automatic cleanup.
+- **Reentrant bindings only** — all FFI uses the `_r` GEOS C API; no global state.
+
+### Support
+
+- **Nim ≥ 2.0.0** — `stable` is CI-gated, `devel` is best-effort (failures non-blocking).
+- **GEOS (`libgeos_c`) ≥ 3.8** — the floor is set by `GEOSGeom_createPointFromXY_r`.
+- **Ubuntu and macOS** — supported, full CI on every push and pull request.
+- **Windows** — experimental: CI runs, failures are non-blocking.
+
+Full matrix and behavioral contracts:
+[support policy](https://github.com/JohnMoutafis/nimgeos/blob/main/docs/support.md).
 
 ### Changed
 
-- **API frozen for 1.0.0** — public API surface is now stable.
-- **`boundaryOp` renamed to `boundary`** — old name kept as deprecated alias.
-- **`toPreparedGeometry` renamed to `prepare`** — old name kept as deprecated alias.
-- **Internal markers added** — raw fields `ctx*`, `handle*` on `GeometryObj`, `GeosContext`,
-  and `CoordSeq` are documented as internal/unstable.
-- **Version bumped to `1.0.0`** — public API is now stable.
+- **`boundaryOp` renamed to `boundary`** — the 0.9.0 name is not carried over; call `boundary()`.
+- **`toPreparedGeometry` renamed to `prepare`** — the 0.9.0 name is not carried over; call `prepare()`.
+- **Internal markers added** — the raw fields `ctx*` / `handle*` on `GeometryObj`, `GeosContext` and
+  `CoordSeq` are documented as internal and unstable.
 
-### Removed
+### Deferred
 
-- **`boundaryOp`** — deprecated alias removed; use `boundary`.
-- **`toPreparedGeometry`** — deprecated alias removed; use `prepare`.
+- **Windows promotion to supported** — pending a reliably green Windows CI lane; the lane runs today
+  with non-blocking failures and community fixes are welcome.
+- **Per-proc exception documentation** — the error hierarchy is documented centrally
+  ([error types](https://github.com/JohnMoutafis/nimgeos/blob/main/docs/patterns/error-types.md));
+  individual procs do not yet enumerate every exception they raise.
+- **Nim `devel` support** — stays best-effort until that CI lane is stable.
 
 ## [0.9.0] - 2025-07-18
 

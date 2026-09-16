@@ -47,7 +47,7 @@ proc createPoint*(ctx: var GeosContext; x, y, z: float): Point =
 ## Raises `GeosGeomError` if the point is nil or GEOS fails.
 proc x*(p: Point): float =
   p.checkHandle("x")
-  var v: cdouble
+  var v: cdouble = 0.0
   if GEOSGeomGetX_r(p.ctx.handle, p.handle, addr v) == 0:
     raise newException(GeosGeomError, "GEOSGeomGetX_r failed")
   return v.float
@@ -56,7 +56,7 @@ proc x*(p: Point): float =
 ## Raises `GeosGeomError` if the point is nil or GEOS fails.
 proc y*(p: Point): float =
   p.checkHandle("y")
-  var v: cdouble
+  var v: cdouble = 0.0
   if GEOSGeomGetY_r(p.ctx.handle, p.handle, addr v) == 0:
     raise newException(GeosGeomError, "GEOSGeomGetY_r failed")
   return v.float
@@ -65,7 +65,7 @@ proc z*(p: Point): float =
   ## Returns the Z coordinate of the Point, or NaN if the point is 2D.
   ## Raises `GeosGeomError` if the point is nil or GEOS fails.
   p.checkHandle("z")
-  var v: cdouble
+  var v: cdouble = NaN
   discard GEOSGeomGetZ_r(p.ctx.handle, p.handle, addr v)
   return v.float
 

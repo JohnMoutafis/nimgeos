@@ -128,7 +128,7 @@ proc area*(g: Geometry): float =
   ## Returns 0.0 for non-polygonal geometries.
   ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("area")
-  var a: cdouble
+  var a: cdouble = 0.0
   if GEOSArea_r(g.ctx.handle, g.handle, addr a) == 0:
     raise newException(GeosGeomError, "GEOSArea_r failed")
   return a.float
@@ -140,7 +140,7 @@ proc length*(g: Geometry): float =
   ## Returns 0.0 for points.
   ## Raises `GeosGeomError` if the geometry is nil or GEOS fails.
   g.checkHandle("length")
-  var l: cdouble
+  var l: cdouble = 0.0
   if GEOSLength_r(g.ctx.handle, g.handle, addr l) == 0:
     raise newException(GeosGeomError, "GEOSLength_r failed")
   return l.float
@@ -148,10 +148,15 @@ proc length*(g: Geometry): float =
 proc distance*(g: Geometry, other: Geometry): float =
   ## Returns the minimum Euclidean distance between `g` and `other`.
   ## Both geometries must be in the same coordinate reference system.
+  ## Returns `0.0` when either geometry is empty — GEOS builds disagree on this
+  ## case (0.0, an error, or an undefined out-parameter), so the value is pinned
+  ## here instead of being inherited from the loaded `libgeos_c`.
   ## Raises `GeosGeomError` if either argument is nil or invalid.
   g.checkHandle("distance g")
   other.checkHandle("distance other")
-  var d: cdouble
+  if g.isEmpty() or other.isEmpty():
+    return 0.0
+  var d: cdouble = 0.0
   if GEOSDistance_r(g.ctx.handle, g.handle, other.handle, addr d) == 0:
     raise newException(GeosGeomError, "GEOSDistance_r failed")
   return d.float

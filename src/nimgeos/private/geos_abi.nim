@@ -2,7 +2,17 @@
 ## Raw importc bindings for libgeos_c — DO NOT use directly.
 ## All functions use the reentrant (_r) API for thread safety.
 
-{.passL: "-lgeos_c".}
+# ── Linkage ──────────────────────────────────────────────────────────────────
+# MSVC's link.exe has no `-l<name>` option — it warns D9002 and skips it, so
+# every GEOS symbol stays unresolved (LNK2019). Name the import library
+# directly instead; the linker resolves it from LIB, which vcpkg sets
+# (triplet x64-windows → lib/geos_c.lib + bin/geos_c.dll). gcc/clang — Linux,
+# macOS, MinGW on Windows — use the `-l` form. Same pattern as Nim's stdlib
+# (lib/ioselects/ioselectors_select.nim: ws2_32 vs ws2_32.lib).
+when defined(vcc) or defined(clang_cl):
+  {.passL: "geos_c.lib".}
+else:
+  {.passL: "-lgeos_c".}
 
 # ── Shared pragmas ────────────────────────────────────────────────────────────
 {.pragma: geosImport,    importc, cdecl, raises: [], gcsafe.}

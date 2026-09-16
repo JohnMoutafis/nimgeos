@@ -20,7 +20,7 @@ Points with a Z coordinate are serialized to `[x, y, z]` arrays. Input coordinat
 ```nim
 import nimgeos
 
-let ctx = initGeosContext()
+var ctx = initGeosContext()
 
 # Serialize
 let point = ctx.fromWKT("POINT (30 10)")

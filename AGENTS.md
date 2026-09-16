@@ -40,4 +40,4 @@ Requires Nim ≥ 2.0.0 and GEOS (`libgeos_c`) ≥ 3.8 on PATH.
 
 ## Read next
 
-[CONTRIBUTING.md](CONTRIBUTING.md) · [Support policy](docs/support.md) · [Installation](docs/getting-started/installation.md) · [Context lifecycle](docs/getting-started/context-lifecycle.md) · [Edge cases](docs/edge-cases.md)
+[CONTRIBUTING.md](CONTRIBUTING.md) · [Support policy](docs/support.md) · [Installation](docs/getting-started/installation.md) · [Context lifecycle](docs/getting-started/context-lifecycle.md) · [Error types](docs/patterns/error-types.md)
